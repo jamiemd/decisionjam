@@ -62,7 +62,7 @@ class Decision extends Component {
         // console.log("decisionCreatorId", this.state.decisionCreatorId);
       })
       .catch(error => {
-        console.log("erorr", error);
+        // console.log("erorr", error.response);
         // this.setState({ decision: error.response.data.error });
       });
     //console.log('decisionCreatorId is ' + this.state.decision);

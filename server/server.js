@@ -175,24 +175,89 @@ server.get(
 );
 
 // postman test example localhost:8000/api/decision/decisionCode/k65gy
+// server.get(
+//   "/api/decision/decisionCode/:decisionCode",
+//   passport.authenticate("jwt", { session: false }),
+//   function(req, res) {
+//     const currentLoddgedInUserId = req.user
+//       ? req.user._id
+//       : "5b01aeb1abaade1eacdc67ce";
+//     const decisionCode = req.params.decisionCode;
+//     console.log("decisionCode", decisionCode);
+//     Decision.find({ decisionCode: decisionCode }).then(
+//       decision => {
+//         decision = Object.assign({ currentLoddgedInUserId }, decision);
+//         return res.status(STATUS_OKAY).json(decision);
+//       }, //{decision = Object.assign({currentLoddgedInUserId},decision);return
+//       err =>
+//         res
+//           .status(STATUS_NOT_FOUND)
+//           .json({ error: "Decision with code " + decisionCode + " not found" })
+//     );
+//   }
+// );
+
 server.get(
   "/api/decision/decisionCode/:decisionCode",
   passport.authenticate("jwt", { session: false }),
   function(req, res) {
-    const currentLoddgedInUserId = req.user
+    const currentLoggedInUserId = req.user
       ? req.user._id
       : "5b01aeb1abaade1eacdc67ce";
     const decisionCode = req.params.decisionCode;
-    console.log("decisionCode", decisionCode);
-    Decision.find({ decisionCode: decisionCode }).then(
-      decision => {
-        decision = Object.assign({ currentLoddgedInUserId }, decision);
-        return res.status(STATUS_OKAY).json(decision);
-      }, //{decision = Object.assign({currentLoddgedInUserId},decision);return
-      err =>
-        res
-          .status(STATUS_NOT_FOUND)
-          .json({ error: "Decision with code " + decisionCode + " not found" })
+    // console.log("decisonCode is " + decisionCode);
+    // console.log("currentLoggedInUserId Pat", currentLoggedInUserId);
+    //  Decision.find({ decisionCode: decisionCode }).then(
+    //   //decision => {decision = Object.assign({decision},{currentLoggedInUserId});return res.status(STATUS_OKAY).json(decision)}, //{decision = Object.assign({currentLoddgedInUserId},decision);return
+    //   decision =>  res.status(STATUS_OKAY).json({decision),
+    //   err =>
+    //     res
+    //       .status(STATUS_NOT_FOUND)
+    //       .json({ error: "Decision with code " + decisionCode + " not found" })
+    // );
+
+    // Decision.findOne({ decisionCode }).then(
+    //   decision => {
+    //     console.log("decision", decision);
+    //     Decision.updateOne(
+    //       { decision },
+    //       { $set: { currentLoggedInUserId } }
+    //     ).then(
+    //       result => {
+    //         console.log("result", result);
+    //         res.status(STATUS_OKAY).json(decision);
+    //       },
+    //       err => {
+    //         console.log("err", err);
+    //         res.status(STATUS_NOT_FOUND).json({
+    //           error: "Decision with id " + id + " not updated" + " " + err
+    //         });
+    //       }
+    //     );
+    //   },
+    //   err =>
+    //     res
+    //       .status(STATUS_NOT_FOUND)
+    //       .json({ error: "Decision with id " + id + " not found" })
+    // );
+
+    Decision.updateOne(
+      { decisionCode },
+      { $set: { currentLoggedInUserId } }
+    ).then(
+      result => {
+        console.log("result", result);
+        Decision.findOne({ decisionCode }).then(decision => {
+          console.log("decision", decision);
+          res.status(STATUS_OKAY).json(decision);
+        });
+      },
+      err => {
+        console.log("err", err);
+        res.status(STATUS_NOT_FOUND).json({
+          error: "Decision with id " + id + " not updated" + " " + err
+        });
+      }
     );
   }
 );
@@ -286,14 +351,17 @@ server.put(
               voted = true;
             }
             if (voted) {
-              decision.save().then(
-                d =>
-                  res.status(STATUS_OKAY).json({
-                    ...d.toObject(),
-                    votesByUser: userVotes(d, userId)
-                  }),
-                err => res.status(STATUS_SERVER_ERROR).json({ error: err })
-              );
+              decision.save().then(d => {
+                console.log("decision", d);
+                res.status(STATUS_OKAY).json({
+                  ...d.toObject(),
+                  votesByUser: userVotes(d, userId)
+                }),
+                  err => {
+                    console.log("err", err);
+                    res.status(STATUS_SERVER_ERROR).json({ error: err });
+                  };
+              });
             } else {
               res.status(STATUS_USER_ERROR).json({
                 status:
@@ -315,7 +383,8 @@ server.put(
   "/api/decision/:decisionCode/voteOverUpdate",
   passport.authenticate("jwt", { session: false }),
   function(req, res) {
-    const decisonCode = req.params.deisionCode;
+    console.log("req", req);
+    const decisonCode = req.params.decisionCode;
     console.log("id", decisonCode);
     console.log(`req.body ${req.body.voteOver}`);
     const voteOver = req.body.voteOver; //TODO add with the user id right now only string
@@ -347,9 +416,21 @@ server.put(
   function(req, res) {
     const decisionCode = req.params.decisionCode;
     const newValue = req.query.newValue;
+    console.log("newValue", newValue);
 
     Decision.findOne({ decisionCode }).then(decision => {
+      console.log(
+        "decision.decisionCreatorId",
+        typeof decision.decisionCreatorId
+      );
+      console.log("req.user", typeof req.user._id);
+      console.log(
+        "decision.decisionCreatorId === req.user._id",
+        decision.decisionCreatorId === String(req.user._id)
+      );
+
       if (decision.decisionCreatorId === req.user.username) {
+        // if (decision.decisionCreatorId === String(req.user._id)) {
         Decision.updateOne(
           { decisionCode },
           { $set: { maxVotesPerUser: newValue } }

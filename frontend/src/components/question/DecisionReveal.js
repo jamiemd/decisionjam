@@ -47,7 +47,7 @@ class DecisionReveal extends Component {
               <div className="answer-container" key={i}>
                 <div className="answer-text">{answers.answerText}</div>
                 <div className="answer-text">
-                  {answers.upVotes.length - answers.downVotes.length}
+                  {answers.downVotes.length - answers.upVotes.length}
                 </div>
               </div>
             ))}

@@ -25,7 +25,7 @@ class DecisionVote extends Component {
       .get(`${ROOT_URL}/api/decision/${decisionCode}`, { headers })
       .then(res => {
         console.log("res", res);
-        console.log("res", res.data.answers);
+        console.log("res.data.answers", res.data.answers);
 
         this.setState({
           decision: res.data.decisionText,
@@ -72,7 +72,7 @@ class DecisionVote extends Component {
           votesByUser: res.data.votesByUser
         });
       })
-      .catch(e => console.log("Vote not counted"));
+      .catch(error => console.log("error", error.response));
   }
 
   areVotesDisabled() {
@@ -84,6 +84,7 @@ class DecisionVote extends Component {
       "Content-Type": "application/json",
       Authorization: this.state.jwtToken
     };
+    console.log(newValue);
     axios
       .put(
         `${ROOT_URL}/api/decision/${
@@ -96,7 +97,7 @@ class DecisionVote extends Component {
         console.log("res", res);
         this.setState({});
       })
-      .catch(e => console.log("error"));
+      .catch(error => console.log("error", error.response));
   }
 
   onMaxVotesClickDown = () => {
@@ -116,7 +117,7 @@ class DecisionVote extends Component {
 
   render() {
     //console.log("this.props", this.props);
-    console.log("this.state", this.state);
+    // console.log("this.state", this.state);
     const answersArray = this.state.answersArray.length;
 
     return (
@@ -140,14 +141,14 @@ class DecisionVote extends Component {
                 <div className="answer-container" key={answer._id}>
                   <div className="answer-text">{answer.answerText}</div>
                   <button
-                    onClick={this.handleUpvote.bind(this, answer._id)}
+                    onClick={this.handleDownvote.bind(this, answer._id)}
                     disabled={this.areVotesDisabled() ? "disabled" : false}
                   >
                     -
                   </button>
                   <div>{answer.downVotes.length - answer.upVotes.length}</div>
                   <button
-                    onClick={this.handleDownvote.bind(this, answer._id)}
+                    onClick={this.handleUpvote.bind(this, answer._id)}
                     disabled={this.areVotesDisabled() ? "disabled" : false}
                   >
                     +
