@@ -13,6 +13,7 @@ class DecisionVote extends Component {
       decisionCreatorId: "",
       currentLoggedInUserId: "",
       isCreator: false,
+      username: "",
       decisionCode: this.props.decisionCode,
       jwtToken: localStorage.getItem("token")
     };
@@ -27,18 +28,17 @@ class DecisionVote extends Component {
     axios
       .get(`${ROOT_URL}/api/decision/${decisionCode}`, { headers })
       .then(res => {
-        // console.log("res", res);
+        console.log("res", res);
         // console.log("res.data.votesByUser", res.data.votesByUser);
         if (res.data.decisionCreatorId === res.data.currentLoggedInUserId) {
           this.setState({ isCreator: true });
         }
-
         this.setState({
           decision: res.data.decisionText,
           answersArray: res.data.answers,
           maxVotesPerUser: res.data.maxVotesPerUser,
-
-          votesByUser: res.data.votesByUser
+          votesByUser: res.data.votesByUser,
+          username: res.data.username
         });
       })
 
@@ -128,7 +128,18 @@ class DecisionVote extends Component {
     const answersArray = this.state.answersArray.length;
     // console.log("this.state.votesByUser", this.state.votesByUser);
     // console.log("this.state.maxVotesPerUser", this.state.maxVotesPerUser);
-    // console.log("this.state.answersArray", this.state.answersArray);
+
+    // console.log(this.state.answersArray);
+
+    let allFilteredUsernames = [];
+    for (let i = 0; i < this.state.answersArray.length; i++) {
+      let filteredUsernames = this.state.answersArray[i].upVotes.filter(
+        username => username === this.state.username
+      );
+      console.log("filteredUsernames.length", filteredUsernames.length);
+      allFilteredUsernames.push(filteredUsernames.length);
+    }
+    console.log("allFilteredUsernames", allFilteredUsernames);
 
     return (
       <div className="post-container">
@@ -158,7 +169,7 @@ class DecisionVote extends Component {
             <div className="no-answer">There are no answers yet. </div>
           ) : (
             <div>
-              {this.state.answersArray.map(answer => (
+              {this.state.answersArray.map((answer, i) => (
                 <div className="answer-container" key={answer._id}>
                   <div className="answer-text">{answer.answerText}</div>
                   <button
@@ -167,7 +178,7 @@ class DecisionVote extends Component {
                   >
                     -
                   </button>
-                  <div>{answer.upVotes.length - answer.downVotes.length}</div>
+                  <div>{allFilteredUsernames[i]}</div>
                   <button
                     onClick={this.handleUpvote.bind(this, answer._id)}
                     disabled={this.areVotesDisabled() ? "disabled" : false}

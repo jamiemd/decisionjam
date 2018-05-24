@@ -164,13 +164,11 @@ server.get(
     Decision.findOne({ decisionCode: id }).then(
       decision => {
         console.log("decision in id", decision);
-        console.log("votesbyobectuser in /decision/:id", {
-          ...decision.toObject(),
-          votesByUser: userVotes(decision, userId)
-        });
+
         res.status(STATUS_OKAY).json({
           ...decision.toObject(),
-          votesByUser: userVotes(decision, userId)
+          votesByUser: userVotes(decision, userId),
+          username: req.user.username
         });
       },
       err =>
