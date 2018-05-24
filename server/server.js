@@ -161,6 +161,11 @@ server.get(
     const userId = req.user.username;
     Decision.findOne({ decisionCode: id }).then(
       decision => {
+        console.log("decision in id", decision);
+        console.log("votesbyobectuser in /decision/:id", {
+          ...decision.toObject(),
+          votesByUser: userVotes(decision, userId)
+        });
         res.status(STATUS_OKAY).json({
           ...decision.toObject(),
           votesByUser: userVotes(decision, userId)
@@ -269,13 +274,14 @@ server.put("/api/decision/:id/answer", function(req, res) {
   const answer = req.body.answer; //TODO add with the user id right now only string
   //check if string answer is empty or null
   // https://stackoverflow.com/questions/154059/how-do-you-check-for-an-empty-string-in-javascript
+  console.log("answer", answer);
   if (!answer) {
     console.log("answer is blank or undefined");
     res.status(STATUS_USER_ERROR).json({ error: "Answer cannot be blank" });
   } else {
     Decision.findOne({ decisionCode: id }).then(
       decision => {
-        console.log("decision", decision);
+        console.log("decision.answers", decision.answers);
         let answers = decision.answers;
         if (answers === undefined) {
           answers = [{ answerText: answer }];
@@ -285,16 +291,15 @@ server.put("/api/decision/:id/answer", function(req, res) {
         Decision.updateOne(
           { decisionCode: id },
           { $set: { answers: answers } }
-        ).then(
-          result =>
-            res
-              .status(STATUS_OKAY)
-              .json({ ...decision.toObject(), votesByUser: 0 }),
-          err =>
-            res.status(STATUS_NOT_FOUND).json({
-              error: "Decision with id " + id + " not updated" + " " + err
-            })
-        );
+        ).then(result => {
+          res
+            .status(STATUS_OKAY)
+            .json({ ...decision.toObject(), votesByUser: 0 }),
+            err =>
+              res.status(STATUS_NOT_FOUND).json({
+                error: "Decision with id " + id + " not updated" + " " + err
+              });
+        });
       },
       err =>
         res
@@ -305,9 +310,20 @@ server.put("/api/decision/:id/answer", function(req, res) {
 });
 
 function userVotes(decision, user) {
+  // console.log("decision", decision);
+  // console.log("decision.answers", decision.answers);
+  console.log("user", user);
   const allUsers = decision.answers.map(a => [...a.upVotes, ...a.downVotes]);
+  console.log("allUsers", allUsers);
   const flattenedUsers = [].concat.apply([], allUsers);
-  const votes = flattenedUsers.find(u => u === user);
+  console.log("flattenedUsers", flattenedUsers);
+
+  // const votes = flattenedUsers.find(u => u === user);
+
+  const votes = flattenedUsers.filter(u => u === user);
+
+  console.log("votes", votes);
+  console.log("votes.length", votes.length);
   return votes === undefined ? 0 : votes.length;
 }
 
@@ -315,10 +331,14 @@ server.put(
   "/api/decision/answer/:id/vote",
   passport.authenticate("jwt", { session: false }),
   function(req, res) {
-    console.log("req", req);
+    // console.log("req", req);
     const answerId = req.params.id;
     const vote = req.query.vote;
     const userId = req.user.username;
+    // console.log("answerId", answerId);
+    // console.log("vote", vote);
+    // console.log("userId", userId);
+
     if (
       vote === undefined ||
       (vote.toUpperCase() !== "YES" && vote.toUpperCase() !== "NO")
@@ -331,11 +351,14 @@ server.put(
         .then(
           decision => {
             const currentVotes = userVotes(decision, userId);
-            console.log(decision);
+            // console.log("decision", decision);
+            console.log("decision.answers", decision.answers);
             let answers = decision.answers;
             const voteForAnswer = answers.find(x => String(x._id) === answerId);
             const upVotes = voteForAnswer.upVotes;
             const downVotes = voteForAnswer.downVotes;
+
+            console.log("voteForAnswer", voteForAnswer);
             var voted = false;
             if (
               vote.toUpperCase() === "YES" &&
@@ -352,13 +375,15 @@ server.put(
             }
             if (voted) {
               decision.save().then(d => {
-                console.log("decision", d);
+                console.log("votesbyobectuser", {
+                  ...d.toObject(),
+                  votesByUser: userVotes(d, userId)
+                });
                 res.status(STATUS_OKAY).json({
                   ...d.toObject(),
                   votesByUser: userVotes(d, userId)
                 }),
                   err => {
-                    console.log("err", err);
                     res.status(STATUS_SERVER_ERROR).json({ error: err });
                   };
               });
@@ -419,15 +444,15 @@ server.put(
     console.log("newValue", newValue);
 
     Decision.findOne({ decisionCode }).then(decision => {
-      console.log(
-        "decision.decisionCreatorId",
-        typeof decision.decisionCreatorId
-      );
-      console.log("req.user", typeof req.user._id);
-      console.log(
-        "decision.decisionCreatorId === req.user._id",
-        decision.decisionCreatorId === String(req.user._id)
-      );
+      // console.log(
+      //   "decision.decisionCreatorId",
+      //   typeof decision.decisionCreatorId
+      // );
+      // console.log("req.user", typeof req.user._id);
+      // console.log(
+      //   "decision.decisionCreatorId === req.user._id",
+      //   decision.decisionCreatorId === String(req.user._id)
+      // );
 
       if (decision.decisionCreatorId === req.user.username) {
         // if (decision.decisionCreatorId === String(req.user._id)) {
@@ -540,8 +565,8 @@ server.get(
 
 mongoose.Promise = global.Promise;
 const connect = mongoose.connect(
-  //("mongodb://localhost/test");
-  "mongodb://sneha.thadani:decisionjam@ds163769.mlab.com:63769/decisionjam"
+  "mongodb://localhost/test"
+  // "mongodb://sneha.thadani:decisionjam@ds163769.mlab.com:63769/decisionjam"
 );
 
 connect.then(

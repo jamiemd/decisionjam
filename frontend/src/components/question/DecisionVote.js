@@ -25,7 +25,7 @@ class DecisionVote extends Component {
       .get(`${ROOT_URL}/api/decision/${decisionCode}`, { headers })
       .then(res => {
         console.log("res", res);
-        console.log("res.data.answers", res.data.answers);
+        console.log("res.data.votesByUser", res.data.votesByUser);
 
         this.setState({
           decision: res.data.decisionText,
@@ -119,6 +119,8 @@ class DecisionVote extends Component {
     //console.log("this.props", this.props);
     // console.log("this.state", this.state);
     const answersArray = this.state.answersArray.length;
+    console.log("this.state.votesByUser", this.state.votesByUser);
+    console.log("this.state.maxVotesPerUser", this.state.maxVotesPerUser);
 
     return (
       <div className="post-container">
