@@ -53,11 +53,41 @@ class Billing extends Component {
       });
   }
 
+  convertDate = unixtimestamp => {
+    let months_arr = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ];
+    let date = new Date(unixtimestamp * 1000);
+    let year = date.getFullYear();
+    let month = months_arr[date.getMonth()];
+    let day = date.getDate();
+    let hours = date.getHours();
+    let minutes = "0" + date.getMinutes();
+    let seconds = "0" + date.getSeconds();
+
+    let convdataTime = month + "-" + day + "-" + year + " ";
+
+    return convdataTime;
+  };
+
+  convertAmount = charge => {
+    return charge * 0.01;
+  };
+
   render() {
     console.log("this.state", this.state);
     const subscription = this.state.subscription;
-
-    // if subscription id, don't show payment form
 
     if (!this.state.didFetchResultFromServer) {
       return null;
@@ -71,20 +101,20 @@ class Billing extends Component {
           <div className="hr-billing " />
 
           <div className="subscription-sub-info-container">
-            <div>Subscription Type: </div>
+            <div>Type </div>
             <div>{subscription.subscriptionType}</div>
           </div>
           <div className="subscription-sub-info-container">
-            <div>Amount Billed: </div>
-            <div>{subscription.amountBilled}</div>
+            <div>Amount Billed </div>
+            <div>${this.convertAmount(subscription.amountBilled)}</div>
           </div>
           <div className="subscription-sub-info-container">
-            <div>Subscription Start Date: </div>
-            <div>{subscription.subscriptionStartDate}</div>
+            <div> Start Date </div>
+            <div>{this.convertDate(subscription.subscriptionStartDate)}</div>
           </div>
           <div className="subscription-sub-info-container">
-            <div>Subscription End Date: </div>
-            <div>{subscription.subscriptionEndDate}</div>
+            <div> End Date </div>
+            <div>{this.convertDate(subscription.subscriptionEndDate)}</div>
           </div>
         </div>
       );

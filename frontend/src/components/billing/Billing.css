@@ -117,6 +117,7 @@ button:hover {
 
 .subscription-info-title {
   padding: 30px;
+  font-weight: 700;
 }
 
 .subscription-info-container {
@@ -129,5 +130,6 @@ button:hover {
 
 .subscription-sub-info-container {
   display: flex;
+  justify-content: space-between;
   padding: 10px;
 }
