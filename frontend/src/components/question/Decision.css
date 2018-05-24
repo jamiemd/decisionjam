@@ -143,7 +143,7 @@ button:disabled {
 
 .vote-counts {
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   margin: 10px;
 }
 
@@ -182,4 +182,25 @@ button:disabled {
   margin: auto;
   font-size: 25px;
   padding-right: 10px;
+}
+
+.your-votes-container {
+  display: flex;
+}
+
+.your-votes-text {
+  color: #282828;
+  font-weight: 500;
+}
+
+.total-votes-container {
+  color: #282828;
+  font-weight: 500;
+}
+
+.totals {
+  color: orange;
+  font-size: 20px;
+  margin-left: 10px;
+  font-weight: 500;
 }

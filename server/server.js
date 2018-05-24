@@ -87,9 +87,9 @@ server.post(
   passport.authenticate("jwt", { session: false }),
   function(req, res) {
     const newDecision = new Decision(req.body);
-    console.log("req.body", req.body);
+    // console.log("req.body", req.body);
     let decisionCode = "feck";
-    console.log(decisionCode);
+    // console.log(decisionCode);
     let decisionCodeDupe = true;
 
     //while (decisionCodeDupe) {  // i need to get this working so that it loops
@@ -163,7 +163,7 @@ server.get(
     const userId = req.user.username;
     Decision.findOne({ decisionCode: id }).then(
       decision => {
-        console.log("decision in id", decision);
+        // console.log("decision in id", decision);
 
         res.status(STATUS_OKAY).json({
           ...decision.toObject(),
@@ -419,6 +419,7 @@ server.put(
     Decision.findOne({ decisionCode }).then(
       decision => {
         console.log("decision in voteover update", decision);
+        decision.voteOver = true;
         Decision.updateOne({ decisionCode }, { $set: { voteOver } }).then(
           result => res.status(STATUS_OKAY).json(decision),
           err =>

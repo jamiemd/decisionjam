@@ -103,7 +103,7 @@ class DecisionVote extends Component {
         { headers }
       )
       .then(res => {
-        // console.log("res", res);
+        console.log("res", res);
         this.setState({});
       })
       .catch(error => console.log("error", error.response));
@@ -126,7 +126,7 @@ class DecisionVote extends Component {
 
   render() {
     //console.log("this.props", this.props);
-    console.log("this.state", this.state);
+    console.log("this.state.voteOver", this.state.voteOver);
     const answersArray = this.state.answersArray.length;
 
     let allFilteredUsernames = [];
@@ -146,6 +146,7 @@ class DecisionVote extends Component {
             <div className="maxvotes-description">Max votes per person</div>
             {this.state.isCreator ? (
               <button
+                disabled={this.state.voteOver}
                 className="maxvotes-button"
                 onClick={this.onMaxVotesClickDown}
               >
@@ -158,6 +159,7 @@ class DecisionVote extends Component {
             <div className="maxvotes-text">{this.state.maxVotesPerUser}</div>
             {this.state.isCreator ? (
               <button
+                disabled={this.state.voteOver}
                 className="maxvotes-button"
                 onClick={this.onMaxVotesClickUp}
               >
@@ -167,10 +169,15 @@ class DecisionVote extends Component {
               ""
             )}
           </div>
+          <div className="hr-decisions " />
+
           <div className="vote-counts">
-            <div>Total Votes</div>
-            <div>
-              Your Votes{this.state.votesByUser}/{this.state.maxVotesPerUser}
+            <div className="total-votes-container">Total votes</div>
+            <div className="your-votes-container">
+              <div className="your-votes-text">Your votes </div>
+              <div className="totals">
+                {this.state.votesByUser}/{this.state.maxVotesPerUser}
+              </div>
             </div>
           </div>
         </div>
@@ -186,7 +193,11 @@ class DecisionVote extends Component {
                     <button
                       className="vote-button"
                       onClick={this.handleDownvote.bind(this, answer._id)}
-                      disabled={this.areVotesDisabled() ? "disabled" : false}
+                      disabled={
+                        this.state.voteOver || this.areVotesDisabled()
+                          ? "disabled"
+                          : false
+                      }
                     >
                       -
                     </button>
@@ -196,7 +207,11 @@ class DecisionVote extends Component {
                     <button
                       className="vote-button"
                       onClick={this.handleUpvote.bind(this, answer._id)}
-                      disabled={this.areVotesDisabled() ? "disabled" : false}
+                      disabled={
+                        this.state.voteOver || this.areVotesDisabled()
+                          ? "disabled"
+                          : false
+                      }
                     >
                       +
                     </button>

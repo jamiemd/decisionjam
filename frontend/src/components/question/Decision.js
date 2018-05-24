@@ -43,7 +43,7 @@ class Decision extends Component {
         // console.log(res.data[0].decisionCreatorId);
         // console.log('userId is'+ res.data[0].currentLoggedInUserId);
         //console.log(res.data.currentLoggedInUserId);
-        console.log("res", res);
+        // console.log("res", res);
         if (res.data.decisionCreatorId === res.data.currentLoggedInUserId) {
           this.setState({ isCreator: true });
         }
@@ -123,7 +123,7 @@ class Decision extends Component {
     // console.log("this.state", this.state);
     // console.log("this.props", this.props);
     // console.log("decisionCreatorId", this.state.decisionCreatorId);
-    console.log("this.state.voteOver", this.state.voteOver);
+    // console.log("this.state.voteOver", this.state.voteOver);
 
     return (
       <div className="decision-container">
