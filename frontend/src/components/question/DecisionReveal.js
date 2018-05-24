@@ -23,7 +23,7 @@ class DecisionReveal extends Component {
     axios
       .get(`${ROOT_URL}/api/decision/${decisionCode}`, { headers })
       .then(res => {
-        // console.log("res.data", res.data);
+        console.log("res.data", res.data);
         this.setState({
           answersArray: res.data.answers
         });

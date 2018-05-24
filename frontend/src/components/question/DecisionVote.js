@@ -10,6 +10,9 @@ class DecisionVote extends Component {
       error: "",
       answersArray: [],
       maxVotesPerUser: 1,
+      decisionCreatorId: "",
+      currentLoggedInUserId: "",
+      isCreator: false,
       decisionCode: this.props.decisionCode,
       jwtToken: localStorage.getItem("token")
     };
@@ -24,13 +27,17 @@ class DecisionVote extends Component {
     axios
       .get(`${ROOT_URL}/api/decision/${decisionCode}`, { headers })
       .then(res => {
-        console.log("res", res);
-        console.log("res.data.votesByUser", res.data.votesByUser);
+        // console.log("res", res);
+        // console.log("res.data.votesByUser", res.data.votesByUser);
+        if (res.data.decisionCreatorId === res.data.currentLoggedInUserId) {
+          this.setState({ isCreator: true });
+        }
 
         this.setState({
           decision: res.data.decisionText,
           answersArray: res.data.answers,
           maxVotesPerUser: res.data.maxVotesPerUser,
+
           votesByUser: res.data.votesByUser
         });
       })
@@ -65,7 +72,7 @@ class DecisionVote extends Component {
         { headers }
       )
       .then(res => {
-        console.log("res", res);
+        // console.log("res", res);
         this.setState({
           ...this.state,
           answersArray: res.data.answers,
@@ -84,7 +91,7 @@ class DecisionVote extends Component {
       "Content-Type": "application/json",
       Authorization: this.state.jwtToken
     };
-    console.log(newValue);
+    // console.log(newValue);
     axios
       .put(
         `${ROOT_URL}/api/decision/${
@@ -94,14 +101,14 @@ class DecisionVote extends Component {
         { headers }
       )
       .then(res => {
-        console.log("res", res);
+        // console.log("res", res);
         this.setState({});
       })
       .catch(error => console.log("error", error.response));
   }
 
   onMaxVotesClickDown = () => {
-    const decisionCode = this.state.decisionCode;
+    // const decisionCode = this.state.decisionCode;
     if (this.state.maxVotesPerUser <= 0) {
       return;
     }
@@ -110,7 +117,7 @@ class DecisionVote extends Component {
   };
 
   onMaxVotesClickUp = () => {
-    const decisionCode = this.state.decisionCode;
+    // const decisionCode = this.state.decisionCode;
     this.setState({ maxVotesPerUser: this.state.maxVotesPerUser + 1 });
     this.sendMaxVotes(this.state.maxVotesPerUser + 1);
   };
@@ -119,20 +126,32 @@ class DecisionVote extends Component {
     //console.log("this.props", this.props);
     // console.log("this.state", this.state);
     const answersArray = this.state.answersArray.length;
-    console.log("this.state.votesByUser", this.state.votesByUser);
-    console.log("this.state.maxVotesPerUser", this.state.maxVotesPerUser);
+    // console.log("this.state.votesByUser", this.state.votesByUser);
+    // console.log("this.state.maxVotesPerUser", this.state.maxVotesPerUser);
+    // console.log("this.state.answersArray", this.state.answersArray);
 
     return (
       <div className="post-container">
         <div className="maxvotes-container">
           <div className="maxVotes">
             <div>Max votes per person</div>
-            <button onClick={this.onMaxVotesClickDown}>-</button>
+            {this.state.isCreator ? (
+              <button onClick={this.onMaxVotesClickDown}>-</button>
+            ) : (
+              ""
+            )}
+
             <div>{this.state.maxVotesPerUser}</div>
-            <button onClick={this.onMaxVotesClickUp}>+</button>
+            {this.state.isCreator ? (
+              <button onClick={this.onMaxVotesClickUp}>+</button>
+            ) : (
+              ""
+            )}
           </div>
           <div>Total Votes</div>
-          <div>Your Votes</div>
+          <div>
+            Your Votes{this.state.votesByUser}/{this.state.maxVotesPerUser}
+          </div>
         </div>
         <div className="answers-container">
           {answersArray === 0 ? (
@@ -148,7 +167,7 @@ class DecisionVote extends Component {
                   >
                     -
                   </button>
-                  <div>{answer.downVotes.length - answer.upVotes.length}</div>
+                  <div>{answer.upVotes.length - answer.downVotes.length}</div>
                   <button
                     onClick={this.handleUpvote.bind(this, answer._id)}
                     disabled={this.areVotesDisabled() ? "disabled" : false}

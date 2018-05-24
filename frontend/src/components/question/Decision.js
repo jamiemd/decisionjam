@@ -43,7 +43,7 @@ class Decision extends Component {
         // console.log(res.data[0].decisionCreatorId);
         // console.log('userId is'+ res.data[0].currentLoggedInUserId);
         //console.log(res.data.currentLoggedInUserId);
-        // console.log("res", res);
+        console.log("res", res);
         if (res.data.decisionCreatorId === res.data.currentLoggedInUserId) {
           this.setState({ isCreator: true });
         }
@@ -99,10 +99,11 @@ class Decision extends Component {
     // request from firing on every reveal button click , we only need it to reveal once
     // conditional would be ((decisionid == currentLoggedInUserId) && this.state.voteOver == false )
     //but first want to get this working and test
+    console.log("this.state.voteOver", this.state.voteOver);
 
-    const voteBodyObject = { voteOver: this.state.voteOver };
+    const voteBodyObject = { voteOver: true };
     const headers = this.state.headers;
-
+    console.log("voteBodyObject", voteBodyObject);
     // update the decision making sure the vote is over
     axios
       .put(
@@ -119,10 +120,10 @@ class Decision extends Component {
   };
 
   render() {
-    console.log("this.state", this.state);
+    // console.log("this.state", this.state);
     // console.log("this.props", this.props);
     // console.log("decisionCreatorId", this.state.decisionCreatorId);
-    console.log("iscreator", this.state.isCreator);
+    console.log("this.state.voteOver", this.state.voteOver);
 
     return (
       <div className="decision-container">

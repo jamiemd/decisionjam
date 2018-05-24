@@ -134,19 +134,21 @@ server.post(
 
     newDecision.decisionCode = decisionCode;
     // console.log("newDecision", newDecision);
-    newDecision.decisionCreatorId = req.user.username;
+
+    // newDecision.decisionCreatorId = req.user.username;
+    newDecision.decisionCreatorId = req.user._id;
 
     // console.log("decision make is" + newDecision.decisionCreatorId);
     console.log("decisionCode", decisionCode);
     //check the user contains all required data
 
     newDecision.save((err, decision) => {
-      console.log("decision", decision);
+      // console.log("decision", decision);
       if (err) {
         console.log("err", err);
         res.status(STATUS_USER_ERROR).json({ error: "Error while adding" });
       } else {
-        console.log("decision in else", decision);
+        // console.log("decision in else", decision);
         res.status(STATUS_OKAY).json({ decision: decision });
       }
     });
@@ -312,18 +314,18 @@ server.put("/api/decision/:id/answer", function(req, res) {
 function userVotes(decision, user) {
   // console.log("decision", decision);
   // console.log("decision.answers", decision.answers);
-  console.log("user", user);
+  // console.log("user", user);
   const allUsers = decision.answers.map(a => [...a.upVotes, ...a.downVotes]);
-  console.log("allUsers", allUsers);
+  // console.log("allUsers", allUsers);
   const flattenedUsers = [].concat.apply([], allUsers);
-  console.log("flattenedUsers", flattenedUsers);
+  // console.log("flattenedUsers", flattenedUsers);
 
   // const votes = flattenedUsers.find(u => u === user);
 
   const votes = flattenedUsers.filter(u => u === user);
 
-  console.log("votes", votes);
-  console.log("votes.length", votes.length);
+  // console.log("votes", votes);
+  // console.log("votes.length", votes.length);
   return votes === undefined ? 0 : votes.length;
 }
 
@@ -408,17 +410,17 @@ server.put(
   "/api/decision/:decisionCode/voteOverUpdate",
   passport.authenticate("jwt", { session: false }),
   function(req, res) {
-    console.log("req", req);
-    const decisonCode = req.params.decisionCode;
-    console.log("id", decisonCode);
+    // console.log("req", req);
+    const decisionCode = req.params.decisionCode;
+    // console.log("id", decisionCode);
     console.log(`req.body ${req.body.voteOver}`);
     const voteOver = req.body.voteOver; //TODO add with the user id right now only string
     //check if string answer is empty or null
     // https://stackoverflow.com/questions/154059/how-do-you-check-for-an-empty-string-in-javascript
-
+    console.log("voteOver", voteOver);
     Decision.findOne({ decisionCode }).then(
       decision => {
-        console.log("decision", decision);
+        console.log("decision in voteover update", decision);
         Decision.updateOne({ decisionCode }, { $set: { voteOver } }).then(
           result => res.status(STATUS_OKAY).json(decision),
           err =>
@@ -441,7 +443,7 @@ server.put(
   function(req, res) {
     const decisionCode = req.params.decisionCode;
     const newValue = req.query.newValue;
-    console.log("newValue", newValue);
+    // console.log("newValue", newValue);
 
     Decision.findOne({ decisionCode }).then(decision => {
       // console.log(
@@ -453,9 +455,8 @@ server.put(
       //   "decision.decisionCreatorId === req.user._id",
       //   decision.decisionCreatorId === String(req.user._id)
       // );
-
-      if (decision.decisionCreatorId === req.user.username) {
-        // if (decision.decisionCreatorId === String(req.user._id)) {
+      // if (decision.decisionCreatorId === req.user.username) {
+      if (decision.decisionCreatorId === String(req.user._id)) {
         Decision.updateOne(
           { decisionCode },
           { $set: { maxVotesPerUser: newValue } }
