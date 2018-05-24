@@ -46,7 +46,7 @@ class Signup extends Component {
         this.setState({ redirect: true });
       })
       .catch(error => {
-        // console.log("error", error);
+        console.log("error", error);
         this.setState({ loginError: error.response.data.error });
       });
   };

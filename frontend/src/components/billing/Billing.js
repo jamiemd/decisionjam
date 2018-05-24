@@ -132,7 +132,9 @@ class Billing extends Component {
           </div>
           <div className="or-divider">Or</div>
           <div className="continue-container">
-            <div className="continue-text">Continue as a free user </div>
+            <div className="continue-text">
+              Continue as a free user if<div /> you don't have a subscription.{" "}
+            </div>
             <Link to="/landing-page">Home</Link>
           </div>
         </div>
