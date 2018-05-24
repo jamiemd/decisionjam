@@ -66,6 +66,7 @@ class Signup extends Component {
     return (
       <div className="signuppage-container">
         <form className="signup-form" onSubmit={this.handleFormSubmit}>
+          <div className="signup-title">Sign Up</div>
           <div className="signup-labels">
             <label>Username</label>
             <div>

@@ -5,6 +5,13 @@
   color: red;
 }
 
+.signup-title {
+  font-weight: 400;
+  color: #303030;
+  font-size: 25px;
+  padding-bottom: 15px;
+}
+
 .signuppage-container {
   padding-top: 80px;
 }

@@ -23,7 +23,7 @@ class Navigation extends Component {
       return (
         <div className="navigation-container">
           <div className="header">
-            <Link to="/landing-page">
+            <Link to="/mainpage">
               <div className="logo">
                 <div className="design">Decision</div>
                 <div className="jam">Jam</div>

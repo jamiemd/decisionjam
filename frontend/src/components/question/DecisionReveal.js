@@ -44,9 +44,9 @@ class DecisionReveal extends Component {
           <div className="reveal-title">We have a winner!</div>
           <div>
             {this.state.answersArray.map((answers, i) => (
-              <div className="answer-container" key={i}>
+              <div className="reveal-answer-container" key={i}>
                 <div className="answer-text">{answers.answerText}</div>
-                <div className="answer-text">
+                <div className="vote-reveal-totals">
                   {answers.upVotes.length - answers.downVotes.length}
                 </div>
               </div>

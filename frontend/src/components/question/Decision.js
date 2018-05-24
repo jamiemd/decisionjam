@@ -62,7 +62,7 @@ class Decision extends Component {
         // console.log("decisionCreatorId", this.state.decisionCreatorId);
       })
       .catch(error => {
-        console.log("erorr", error);
+        // console.log("erorr", error.response);
         // this.setState({ decision: error.response.data.error });
       });
     //console.log('decisionCreatorId is ' + this.state.decision);
@@ -99,10 +99,11 @@ class Decision extends Component {
     // request from firing on every reveal button click , we only need it to reveal once
     // conditional would be ((decisionid == currentLoggedInUserId) && this.state.voteOver == false )
     //but first want to get this working and test
+    console.log("this.state.voteOver", this.state.voteOver);
 
-    const voteBodyObject = { voteOver: this.state.voteOver };
+    const voteBodyObject = { voteOver: true };
     const headers = this.state.headers;
-
+    console.log("voteBodyObject", voteBodyObject);
     // update the decision making sure the vote is over
     axios
       .put(
@@ -119,16 +120,16 @@ class Decision extends Component {
   };
 
   render() {
-    console.log("this.state", this.state);
+    // console.log("this.state", this.state);
     // console.log("this.props", this.props);
     // console.log("decisionCreatorId", this.state.decisionCreatorId);
-    console.log("iscreator", this.state.isCreator);
+    // console.log("this.state.voteOver", this.state.voteOver);
 
     return (
       <div className="decision-container">
         <div className="decision-title">{this.state.decision}</div>
         <div className="decision-code">
-          <div className="code-title">Code</div>
+          <div className="code-title">Share this code</div>
           <div className="code-text"> {this.state.decisionCode} </div>
         </div>
         <div className="hr-decisions" />
@@ -147,22 +148,6 @@ class Decision extends Component {
           >
             Vote
           </button>
-          {/* <button
-            //disabled if (decisionCreatorid or Logged in userid empty or if the id's don't match or if the vote is over)
-            disabled={
-              !(
-                this.state.decisionCreatorId ==
-                  this.state.currentLoggedInUserId || this.state.voteOver
-              )
-            }
-            // disabled={!this.state.decisionCreatorId}
-            className={
-              this.state.revealIsActive ? "active-tab" : "inactive-tab"
-            }
-            onClick={this.onRevealButtonClick}
-          >
-            Reveal
-          </button> */}
 
           {this.state.isCreator ? (
             <button

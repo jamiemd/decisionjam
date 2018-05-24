@@ -98,7 +98,7 @@ module.exports = server => {
     passport.authenticate("jwt", { session: false }),
     function(req, res) {
       // console.log("req", req);
-      // console.log("req.user", req.user);
+      console.log("req.user", req.user);
 
       Billing.findOne({ username: req.user.username })
         .sort({ subscriptionID: -1 })
