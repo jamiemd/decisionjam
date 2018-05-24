@@ -148,22 +148,6 @@ class Decision extends Component {
           >
             Vote
           </button>
-          {/* <button
-            //disabled if (decisionCreatorid or Logged in userid empty or if the id's don't match or if the vote is over)
-            disabled={
-              !(
-                this.state.decisionCreatorId ==
-                  this.state.currentLoggedInUserId || this.state.voteOver
-              )
-            }
-            // disabled={!this.state.decisionCreatorId}
-            className={
-              this.state.revealIsActive ? "active-tab" : "inactive-tab"
-            }
-            onClick={this.onRevealButtonClick}
-          >
-            Reveal
-          </button> */}
 
           {this.state.isCreator ? (
             <button

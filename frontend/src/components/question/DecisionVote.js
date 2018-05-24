@@ -111,9 +111,7 @@ class DecisionVote extends Component {
 
   onMaxVotesClickDown = () => {
     // const decisionCode = this.state.decisionCode;
-    if (this.state.maxVotesPerUser <= 0) {
-      return;
-    }
+
     this.setState({ maxVotesPerUser: this.state.maxVotesPerUser - 1 });
     this.sendMaxVotes(this.state.maxVotesPerUser - 1);
   };
@@ -129,15 +127,30 @@ class DecisionVote extends Component {
     console.log("this.state.voteOver", this.state.voteOver);
     const answersArray = this.state.answersArray.length;
 
-    let allFilteredUsernames = [];
+    let allFilteredUsernamesUpVotes = [];
+    let allFilteredUsernamesDownVotes = [];
+
     for (let i = 0; i < this.state.answersArray.length; i++) {
       let filteredUsernames = this.state.answersArray[i].upVotes.filter(
         username => username === this.state.username
       );
-      // console.log("filteredUsernames.length", filteredUsernames.length);
-      allFilteredUsernames.push(filteredUsernames.length);
+      allFilteredUsernamesUpVotes.push(filteredUsernames.length);
     }
-    // console.log("allFilteredUsernames", allFilteredUsernames);
+    for (let i = 0; i < this.state.answersArray.length; i++) {
+      let filteredUsernames = this.state.answersArray[i].downVotes.filter(
+        username => username === this.state.username
+      );
+      allFilteredUsernamesDownVotes.push(filteredUsernames.length);
+    }
+
+    let totalVotes = 0;
+    for (let i = 0; i < this.state.answersArray.length; i++) {
+      totalVotes += this.state.answersArray[i].upVotes.length;
+    }
+    for (let i = 0; i < this.state.answersArray.length; i++) {
+      totalVotes += this.state.answersArray[i].downVotes.length;
+    }
+    console.log("totalVotes", totalVotes);
 
     return (
       <div className="post-container">
@@ -172,7 +185,10 @@ class DecisionVote extends Component {
           <div className="hr-decisions " />
 
           <div className="vote-counts">
-            <div className="total-votes-container">Total votes</div>
+            <div className="total-votes-container">
+              <div>Total votes</div>
+              <div className="totals">{totalVotes}</div>
+            </div>
             <div className="your-votes-container">
               <div className="your-votes-text">Your votes </div>
               <div className="totals">
@@ -202,7 +218,8 @@ class DecisionVote extends Component {
                       -
                     </button>
                     <div className="answer-vote-number">
-                      {allFilteredUsernames[i]}
+                      {allFilteredUsernamesUpVotes[i] -
+                        allFilteredUsernamesDownVotes[i]}
                     </div>
                     <button
                       className="vote-button"
