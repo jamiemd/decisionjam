@@ -129,7 +129,7 @@ class Decision extends Component {
       <div className="decision-container">
         <div className="decision-title">{this.state.decision}</div>
         <div className="decision-code">
-          <div className="code-title">Code</div>
+          <div className="code-title">Share this code</div>
           <div className="code-text"> {this.state.decisionCode} </div>
         </div>
         <div className="hr-decisions" />

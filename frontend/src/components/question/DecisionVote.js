@@ -14,6 +14,7 @@ class DecisionVote extends Component {
       currentLoggedInUserId: "",
       isCreator: false,
       username: "",
+      voteOver: false,
       decisionCode: this.props.decisionCode,
       jwtToken: localStorage.getItem("token")
     };
@@ -38,7 +39,8 @@ class DecisionVote extends Component {
           answersArray: res.data.answers,
           maxVotesPerUser: res.data.maxVotesPerUser,
           votesByUser: res.data.votesByUser,
-          username: res.data.username
+          username: res.data.username,
+          voteOver: res.data.voteOver
         });
       })
 
@@ -124,67 +126,81 @@ class DecisionVote extends Component {
 
   render() {
     //console.log("this.props", this.props);
-    // console.log("this.state", this.state);
+    console.log("this.state", this.state);
     const answersArray = this.state.answersArray.length;
-    // console.log("this.state.votesByUser", this.state.votesByUser);
-    // console.log("this.state.maxVotesPerUser", this.state.maxVotesPerUser);
-
-    // console.log(this.state.answersArray);
 
     let allFilteredUsernames = [];
     for (let i = 0; i < this.state.answersArray.length; i++) {
       let filteredUsernames = this.state.answersArray[i].upVotes.filter(
         username => username === this.state.username
       );
-      console.log("filteredUsernames.length", filteredUsernames.length);
+      // console.log("filteredUsernames.length", filteredUsernames.length);
       allFilteredUsernames.push(filteredUsernames.length);
     }
-    console.log("allFilteredUsernames", allFilteredUsernames);
+    // console.log("allFilteredUsernames", allFilteredUsernames);
 
     return (
       <div className="post-container">
         <div className="maxvotes-container">
           <div className="maxVotes">
-            <div>Max votes per person</div>
+            <div className="maxvotes-description">Max votes per person</div>
             {this.state.isCreator ? (
-              <button onClick={this.onMaxVotesClickDown}>-</button>
+              <button
+                className="maxvotes-button"
+                onClick={this.onMaxVotesClickDown}
+              >
+                -
+              </button>
             ) : (
               ""
             )}
 
-            <div>{this.state.maxVotesPerUser}</div>
+            <div className="maxvotes-text">{this.state.maxVotesPerUser}</div>
             {this.state.isCreator ? (
-              <button onClick={this.onMaxVotesClickUp}>+</button>
+              <button
+                className="maxvotes-button"
+                onClick={this.onMaxVotesClickUp}
+              >
+                +
+              </button>
             ) : (
               ""
             )}
           </div>
-          <div>Total Votes</div>
-          <div>
-            Your Votes{this.state.votesByUser}/{this.state.maxVotesPerUser}
+          <div className="vote-counts">
+            <div>Total Votes</div>
+            <div>
+              Your Votes{this.state.votesByUser}/{this.state.maxVotesPerUser}
+            </div>
           </div>
         </div>
         <div className="answers-container">
           {answersArray === 0 ? (
-            <div className="no-answer">There are no answers yet. </div>
+            <div className="no-answer">There are no answers. </div>
           ) : (
             <div>
               {this.state.answersArray.map((answer, i) => (
                 <div className="answer-container" key={answer._id}>
                   <div className="answer-text">{answer.answerText}</div>
-                  <button
-                    onClick={this.handleDownvote.bind(this, answer._id)}
-                    disabled={this.areVotesDisabled() ? "disabled" : false}
-                  >
-                    -
-                  </button>
-                  <div>{allFilteredUsernames[i]}</div>
-                  <button
-                    onClick={this.handleUpvote.bind(this, answer._id)}
-                    disabled={this.areVotesDisabled() ? "disabled" : false}
-                  >
-                    +
-                  </button>
+                  <div className="vote-buttons-container">
+                    <button
+                      className="vote-button"
+                      onClick={this.handleDownvote.bind(this, answer._id)}
+                      disabled={this.areVotesDisabled() ? "disabled" : false}
+                    >
+                      -
+                    </button>
+                    <div className="answer-vote-number">
+                      {allFilteredUsernames[i]}
+                    </div>
+                    <button
+                      className="vote-button"
+                      onClick={this.handleUpvote.bind(this, answer._id)}
+                      disabled={this.areVotesDisabled() ? "disabled" : false}
+                    >
+                      +
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>

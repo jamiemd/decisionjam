@@ -64,7 +64,7 @@ class Signup extends Component {
       // if there is a subscription ID, go to landing page
 
       if (this.state.signInCounter === null) {
-        return <Redirect to="/landing-page" />;
+        return <Redirect to="/mainpage" />;
       } else {
         // console.log("redirect");
         const getQueryString = (field, url) => {
