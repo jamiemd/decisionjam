@@ -91,6 +91,8 @@ class Signup extends Component {
     return (
       <div className="signinpage-container">
         <form className="signin-form" onSubmit={this.handleFormSubmit}>
+          <div className="signin-title">Sign In</div>
+
           <div className="signin-labels">
             <label>Username</label>
             <div>

@@ -61,6 +61,7 @@ class LandingPage extends Component {
             <div className="pricing-options">
               <div className="options">
                 <h1>Unlimited</h1>
+                <div>Decisions and Voters</div>
                 <h3>$5</h3>
                 <p>Monthly</p>
                 <div className="buy-container pricing-buy">
@@ -71,6 +72,8 @@ class LandingPage extends Component {
               </div>
               <div className="options">
                 <h1>Unlimited</h1>
+                <div>Decisions and Voters</div>
+
                 <h3>$20</h3>
                 <p>6 Months</p>
                 <div className="buy-container pricing-buy">
@@ -81,6 +84,8 @@ class LandingPage extends Component {
               </div>
               <div className="options">
                 <h1>Unlimited</h1>
+                <div>Decisions and Voters</div>
+
                 <h3>$50</h3>
                 <p>1 Year</p>
                 <div className="buy-container pricing-buy">
