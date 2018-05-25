@@ -20,7 +20,11 @@ Decision Jam is an app that allows teams to make decisions quickly. Team members
 
 **Admin Billing Panel:** Billing page for subscription service.
 
-## Installation
+## Technologies
+
+React, Express, Node, MongoDB
+
+## Setup
 
 ```
 npm start
@@ -30,6 +34,6 @@ nodemon server.js
 mongod
 ```
 
-## Technologies
+### Contributors
 
-React, Express, Node, MongoDB
+Jamie Domingo | Pat Collins | Sneha Thadani
