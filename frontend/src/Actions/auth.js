@@ -18,7 +18,7 @@ export const signup = (username, email, password) => {
         });
       })
       .catch(error => {
-        console.log("error", error);
+        console.log("error", error.response);
       });
   };
 };

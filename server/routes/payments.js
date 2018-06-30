@@ -1,13 +1,11 @@
 const stripe = require("stripe")("sk_test_LdNhOn0s563Qt83R14hhLyGQ");
-const server = require("./server.js");
-const Billing = require("./db/BillingModel.js");
+const Billing = require("../db/BillingModel.js");
 const passport = require("passport");
-const jwt = require("jwt-simple");
 
-module.exports = server => {
+module.exports = app => {
   // charge customer
 
-  server.post(
+  app.post(
     "/api/payment",
     passport.authenticate("jwt", { session: false }),
     function(req, res) {
@@ -18,7 +16,6 @@ module.exports = server => {
       const selectedOption = req.body.postData.selectedOption;
 
       console.log("stripeToken:", stripeToken);
-      //translate plan names from front end to ids
       let planName = "";
       if (selectedOption === "Monthly") {
         planName = "plan_CpN6kHzPE3J5bX";
@@ -80,7 +77,7 @@ module.exports = server => {
 
   // when sign up as free user button clicked, save free user info in billing model
   // based on userID check subscription end date and compare with today's date
-  server.get("/api/make-decision/:soID", (req, res) => {
+  app.get("/api/make-decision/:soID", (req, res) => {
     console.log("req.params", req.params.soID);
     const soID = req.params.soID;
     Billing.findOne({ userID: soID }).then(endDate => {
@@ -93,7 +90,7 @@ module.exports = server => {
     });
   });
 
-  server.get(
+  app.get(
     "/api/subscriptionID",
     passport.authenticate("jwt", { session: false }),
     function(req, res) {

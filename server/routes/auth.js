@@ -1,25 +1,17 @@
 const jwt = require("jwt-simple");
+const passport = require("passport");
+const User = require("../db/UserModel");
+const Billing = require("../db/BillingModel.js");
+
+const STATUS_USER_ERROR = 422;
+const STATUS_SERVER_ERROR = 500;
+const STATUS_OKAY = 200;
+const STATUS_NOT_FOUND = 404;
 
 module.exports = app => {
-  app.get(
-    "/api/users",
-    passport.authenticate("jwt", { session: false }),
-    function(req, res) {
-      User.find({}, (err, users) => {
-        if (err) {
-          res
-            .status(STATUS_USER_ERROR)
-            .json({ error: "Could not find the user." });
-        } else {
-          res.status(STATUS_OKAY).json(users);
-        }
-      });
-    }
-  );
-
-  app.post("/api/users/adduser", function(req, res) {
+  // signup
+  app.post("/api/signup", function(req, res) {
     const newUser = new User(req.body);
-    //check the user contains all required data
     if (!newUser.username || !newUser.password || !newUser.email) {
       res.status(400).json({ error: "Missing required information" });
       return;
@@ -46,9 +38,7 @@ module.exports = app => {
     });
   });
 
-  //gotta convert ugly callback code to beautiful promises
-  //http://erikaybar.name/using-es6-promises-with-mongoosejs-queries/
-  // route to authenticate a user (POST http://localhost:8080/api/login)
+  // login
   app.post("/api/login", function(req, res) {
     if (!req.body.username || !req.body.password) {
       res.status(400).json({ error: "Missing required information" });
@@ -109,27 +99,24 @@ module.exports = app => {
     );
   });
 
-  /* Handle Logout */
-
-  //see last comment https://stackoverflow.com/questions/45541182/passport-req-logout-function-not-working
+  // logout
   app.get(
     "/api/logout",
     passport.authenticate("jwt", { session: false }),
     function(req, res) {
-      console.log("I am Logout");
+      console.log("Logged Out");
       req.logout();
       res.status(200).redirect("/");
     }
   );
 
-  //how to setup routes that need auth as well as test it on postman
-  //https://jonathanmh.com/express-passport-json-web-token-jwt-authentication-beginners/
+  // authenticate
   app.get(
-    "/api/routeThatNeedsJWTToken",
+    "/api/authenticate",
     passport.authenticate("jwt", { session: false }),
     function(req, res) {
       res.json({
-        "Success! You can not see this without a token": "bla",
+        message: "Success! You can not see this without a token",
         user: req.user
       });
     }

@@ -1,26 +1,21 @@
 const bodyParser = require("body-parser");
 const express = require("express");
-const server = express();
+const app = express();
 const mongoose = require("mongoose");
-const User = require("./db/UserModel.js");
-const Decision = require("./db/DecisionModel.js");
 const cors = require("cors");
-const Billing = require("./db/BillingModel.js");
 
-const jwt = require("jwt-simple");
+app.use(cors());
+app.use(bodyParser.json());
+
+const auth = require("./routes/auth.js");
+auth(app);
+const decision = require("./routes/decision.js");
+decision(app);
+const payments = require("./routes/payments.js");
+payments(app);
+
 const passport = require("passport");
-const config = require("./config/passport.js");
-
-const STATUS_USER_ERROR = 422;
-const STATUS_SERVER_ERROR = 500;
-const STATUS_OKAY = 200;
-const STATUS_NOT_FOUND = 404;
-
-server.use(cors());
-server.use(bodyParser.json());
-
-server.use(passport.initialize());
-// pass passport for configuration
+app.use(passport.initialize());
 require("./config/passport")(passport);
 
 passport.serializeUser(function(user, done) {
@@ -30,26 +25,17 @@ passport.serializeUser(function(user, done) {
 passport.deserializeUser(function(user, done) {
   done(null, user);
 });
-const payments = require("./Payments.js");
-payments(server);
-
-server.get("/", function(req, res) {
-  res.status(200).json({ message: "API running" });
-});
 
 mongoose.Promise = global.Promise;
-const connect = mongoose.connect(
-  "mongodb://localhost/test"
-  // "mongodb://sneha.thadani:decisionjam@ds163769.mlab.com:63769/decisionjam"
-);
+const connect = mongoose.connect("mongodb://localhost/decisionjam");
 
 connect.then(
   () => {
     const port = 8000;
-    server.listen(port);
+    app.listen(port);
     console.log(`Server Listening on ${port}`);
   },
   err => {
-    console.log("could not connect to MongoDB");
+    console.log("could not connect to MongoDB", err);
   }
 );

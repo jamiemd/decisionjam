@@ -1,4 +1,6 @@
-module.export = app => {
+const passport = require("passport");
+
+module.exports = app => {
   app.post(
     "/api/decision/create",
     passport.authenticate("jwt", { session: false }),
