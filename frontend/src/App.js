@@ -1,15 +1,15 @@
 import React, { Component } from "react";
-import "./App.css";
 import { BrowserRouter, Route } from "react-router-dom";
-import Landing from "./components/landing/Landing";
-import Billing from "./components/billing/Billing";
 import { StripeProvider } from "react-stripe-elements";
-import Question from "./components/question/Question";
-import Main from "./components/question/Main";
-import SignUp from "./components/signup/SignUp";
-import SignIn from "./components/signin/SignIn";
-import Navigation from "./components/landing/Navigation";
-import Decision from "./components/question/Decision";
+import Home from "./components/home/Home";
+import Navigation from "./components/home/Navigation";
+import SignUp from "./components/auth/SignUp";
+import Login from "./components/auth/Login";
+import Billing from "./components/billing/Billing";
+import CreateDecision from "./components/decision/CreateDecision";
+import FindDecision from "./components/decision/FindDecision";
+// import Decision from "./components/decision/decisionPage/Decision";
+import "./App.css";
 
 class App extends Component {
   render() {
@@ -18,16 +18,15 @@ class App extends Component {
         <BrowserRouter>
           <div className="App">
             <Navigation />
-            <Route exact path="/" component={Landing} />
-            <Route exact path="/landing-page" component={Landing} />
+            <Route exact path="/" component={Home} />
+            <Route exact path="/signup" component={SignUp} />
+            <Route exact path="/login" component={Login} />
+            <Route exact path="/logout" component={Home} />
             <Route exact path="/billing/:id" component={Billing} />
             <Route exact path="/billing" component={Billing} />
-            <Route exact path="/question-page" component={Question} />
-            <Route exact path="/mainpage" component={Main} />
-            <Route path="/decision/decisionCode/:id" component={Decision} />
-            <Route exact path="/signup" component={SignUp} />
-            <Route exact path="/signin" component={SignIn} />
-            <Route exact path="/logout" component={Landing} />
+            <Route exact path="/create-decision" component={CreateDecision} />
+            <Route exact path="/find-decision" component={FindDecision} />
+            {/* <Route path="/decision/decisionCode/:id" component={Decision} /> */}
           </div>
         </BrowserRouter>
       </StripeProvider>

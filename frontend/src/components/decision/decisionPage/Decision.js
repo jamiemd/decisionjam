@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import "./Decision.css";
+import "../../css/Decision.css";
 import DecisionPost from "./DecisionPost.js";
 import DecisionVote from "./DecisionVote.js";
 import DecisionReveal from "./DecisionReveal.js";

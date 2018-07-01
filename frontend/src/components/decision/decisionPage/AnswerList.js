@@ -1,11 +1,11 @@
-import React from 'react';
+import React from "react";
 
 class Answer extends React.Component {
   state = {
     isloggedIn: false,
-    isAdmin: false
+    isAdmin: false,
     isVoting: true,
-    answerText: '',
+    answerText: ""
   };
 
   render() {
@@ -15,7 +15,6 @@ class Answer extends React.Component {
     return (
       <li>
         <button
-          
           onClick={() => {
             this.props.updateAnswer(answer.votes + 1);
           }}
@@ -48,7 +47,7 @@ class Answer extends React.Component {
             </button>
           </div>
         ) : (
-          <div onClick={this.toggleEditing} style={{ flex: '1' }}>
+          <div onClick={this.toggleEditing} style={{ flex: "1" }}>
             {answer.name}
           </div>
         )}
@@ -74,14 +73,14 @@ class Answer extends React.Component {
         this.setState({ editing: false });
       })
       .catch(() => {
-        console.error('update failed');
+        console.error("update failed");
       });
   };
 
   toggleEditing = () => {
     this.setState(prevState => {
       return {
-        editing: !prevState.editing,
+        editing: !prevState.editing
       };
     });
   };
@@ -89,16 +88,12 @@ class Answer extends React.Component {
 
 function AnswerList(props) {
   return (
-<div>
-    
+    <div>
       <div>
         <ul>
           {props.answers.map(answer => {
-            return (
-            <li key={answer._id}>{answer.answerText}</li>
-          )  
-        })}  
-        
+            return <li key={answer._id}>{answer.answerText}</li>;
+          })}
         </ul>
       </div>
     </div>
@@ -117,9 +112,8 @@ function AnswerList(props) {
   );
 }
 
-
 AnswerList.defaultProps = {
-  answers: [],
+  answers: []
 };
 
 export default AnswerList;

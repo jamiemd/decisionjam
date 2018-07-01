@@ -11,8 +11,8 @@ const auth = require("./routes/auth.js");
 auth(app);
 const decision = require("./routes/decision.js");
 decision(app);
-const payments = require("./routes/payments.js");
-payments(app);
+const billing = require("./routes/billing.js");
+billing(app);
 
 const passport = require("passport");
 app.use(passport.initialize());

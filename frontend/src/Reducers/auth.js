@@ -1,8 +1,9 @@
 import {
   USER_REGISTERED,
   USER_AUTHENTICATED,
-  USER_UNAUTHENTICATED
-} from "../actions/auth";
+  USER_UNAUTHENTICATED,
+  AUTHENTICATION_ERROR
+} from "../Actions/auth";
 
 export default (
   auth = {
@@ -14,9 +15,11 @@ export default (
     case USER_REGISTERED:
       return { ...auth, isRegistered: true };
     case USER_AUTHENTICATED:
-      return { ...auth, isAuthenticated: true };
+      return { ...auth, isLoggedIn: true };
     case USER_UNAUTHENTICATED:
-      return { ...auth, isAuthenticated: false };
+      return { ...auth, isLoggedIn: false };
+    case AUTHENTICATION_ERROR:
+      return { ...auth, error: action.payload };
     default:
       return auth;
   }

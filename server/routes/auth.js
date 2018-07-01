@@ -49,26 +49,19 @@ module.exports = app => {
         $or: [{ email: req.body.email }, { username: req.body.username }]
       },
       function(err, user) {
-        console.log("err:", err);
         if (err) throw err;
         if (!user) {
           res.json({
             success: false,
-            msg: "Authentication failed. User not found."
+            message: "Authentication failed. User not found."
           });
         } else {
-          // check if password matches
-          console.log(user.password, req.body.password);
           user.comparePassword(req.body.password, function(err, isMatch) {
-            console.log(isMatch);
             if (isMatch && !err) {
-              // if user is found and password is right create a token
               var token = jwt.encode(user, "cs5Rocks");
-              // return the information including token as JSON
               Billing.findOne({ username: req.body.username })
                 .sort({ subscriptionID: -1 })
                 .then((subscription, err) => {
-                  // console.log('subscription', subscription, 'err', err);
                   if (!subscription) {
                     res.json({
                       success: true,
@@ -100,15 +93,14 @@ module.exports = app => {
   });
 
   // logout
-  app.get(
-    "/api/logout",
-    passport.authenticate("jwt", { session: false }),
-    function(req, res) {
-      console.log("Logged Out");
-      req.logout();
-      res.status(200).redirect("/");
-    }
-  );
+  app.get("/api/logout", function(req, res) {
+    console.log("Logged Out");
+    req.logout();
+    res.json({
+      status: "Logged Out",
+      message: "Please Login Again"
+    });
+  });
 
   // authenticate
   app.get(

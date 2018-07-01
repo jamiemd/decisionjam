@@ -1,27 +1,14 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import "./Landing.css";
 import appImage from "./decisionjam-screenshot.png";
-import Main from "../question/Main";
+import FindDecision from "../decision/FindDecision";
+import { connect } from "react-redux";
+import "../../css/Home.css";
 
-class LandingPage extends Component {
+class Home extends Component {
   render() {
-    let token = localStorage.getItem("token");
-    // console.log(token);
-
-    // if returning user show welcome back page
-    if (token) {
-      return (
-        // <div className="welcome-container">
-        //   <h1> Welcome </h1>
-        //   <div className="hr-landing" />
-        //   <div className="create-decision-home">
-        //     <Link to="/question-page">Create a new decision now.</Link>
-        //   </div>
-        // </div>
-        <Main />
-      );
-      // if new user show landing page
+    if (this.props.isLoggedIn) {
+      return <FindDecision />;
     } else {
       return (
         <div className="landing">
@@ -106,4 +93,11 @@ class LandingPage extends Component {
   }
 }
 
-export default LandingPage;
+const mapStateToProps = state => {
+  console.log("state", state);
+  return {
+    isLoggedIn: state
+  };
+};
+
+export default connect(mapStateToProps)(Home);

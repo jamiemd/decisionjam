@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { injectStripe } from "react-stripe-elements";
-import "./Billing.css";
+import "../../css/Billing.css";
 import CardSection from "./CardSection";
 import axios from "axios";
 import { Redirect } from "react-router-dom";

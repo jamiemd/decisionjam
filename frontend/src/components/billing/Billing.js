@@ -1,9 +1,11 @@
 import React, { Component } from "react";
-import "./Billing.css";
 import { Elements } from "react-stripe-elements";
 import InjectedCheckoutForm from "./CheckoutForm";
 import { Link } from "react-router-dom";
 import axios from "axios";
+import { connect } from "react-redux";
+import "../../css/Billing.css";
+import { authenticate } from "../../actions/auth";
 
 const ROOT_URL = "http://localhost:8000";
 
@@ -19,6 +21,8 @@ class Billing extends Component {
   };
 
   componentDidMount() {
+    this.props.authenticate();
+
     const headers = this.state.headers;
     axios
       .get(`${ROOT_URL}/api/routeThatNeedsJWTToken`, { headers })
@@ -143,4 +147,14 @@ class Billing extends Component {
   }
 }
 
-export default Billing;
+const mapStateToProps = state => {
+  console.log("state", state);
+  return {
+    isLoggedIn: state.auth.isLoggedIn
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  { authenticate }
+)(Billing);

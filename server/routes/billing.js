@@ -68,8 +68,8 @@ module.exports = app => {
             }
           );
         })
-        .catch(function(error) {
-          console.log("charge failed");
+        .catch(error => {
+          console.log("charge failed", error);
           res.json({ success: false, message: "Charge failed" });
         });
     }

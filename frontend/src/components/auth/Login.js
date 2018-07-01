@@ -1,17 +1,18 @@
 import React, { Component } from "react";
 import { reduxForm, Field } from "redux-form";
 import { connect } from "react-redux";
-import { signup } from "../../actions/auth";
-import "../../css/SignUp.css";
+import { login } from "../../actions/auth";
+import "../../css/Login.css";
 
-class SignUp extends Component {
+class Login extends Component {
   renderAlert = () => {
     if (!this.props.error) return null;
     return <div className="error">{this.props.error}</div>;
   };
 
-  handleFormSubmit = ({ username, email, password }) => {
-    this.props.signup(username, email, password);
+  handleFormSubmit = ({ username, password }) => {
+    const { history } = this.props;
+    this.props.login(username, password, history);
   };
 
   render() {
@@ -20,19 +21,17 @@ class SignUp extends Component {
     const { handleSubmit } = this.props;
 
     return (
-      <div className="signup-container">
+      <div className="signinpage-container">
+        <div className="signin-title">Login</div>
         <form
-          className="signup-form"
+          className="signin-form"
           onSubmit={handleSubmit(this.handleFormSubmit.bind(this))}
         >
-          <div className="signup-title">Sign Up</div>
-          <label> Username</label>
+          <label>Username</label>
           <Field name="username" component="input" type="text" />
-          <label> Email</label>
-          <Field name="email" component="input" type="text" />
-          <label> Password</label>
+          <label>Password</label>
           <Field name="password" component="input" type="text" />
-          <button type="submit">Sign Up</button>
+          <button type="submit">Login</button>
           {this.renderAlert()}
         </form>
       </div>
@@ -43,17 +42,16 @@ class SignUp extends Component {
 const mapStateToProps = state => {
   console.log("state", state);
   return {
-    error: state.auth.error,
-    registered: state.auth.registered
+    error: state.auth.error
   };
 };
 
-SignUp = connect(
+Login = connect(
   mapStateToProps,
-  { signup }
-)(SignUp);
+  { login }
+)(Login);
 
 export default reduxForm({
-  form: "signup",
-  fields: ["username", "email", "password"]
-})(SignUp);
+  form: "login",
+  fields: ["username,", "email", "password"]
+})(Login);

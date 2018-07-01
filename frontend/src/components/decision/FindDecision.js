@@ -1,7 +1,7 @@
 import React, { Component } from "react";
-import "./Main.css";
 import axios from "axios";
 import { Redirect } from "react-router-dom";
+import "../../css/FindDecision.css";
 
 const ROOT_URL = "http://localhost:8000";
 

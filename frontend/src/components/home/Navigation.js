@@ -1,25 +1,18 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
-import "./Navigation.css";
-import axios from "axios";
-
-const ROOT_URL = "http://localhost:8000";
+import { connect } from "react-redux";
+import { logout } from "../../actions/auth";
+import "../../css/Navigation.css";
 
 class Navigation extends Component {
-  // remove token and redirect from backend
-  handleLogoutClick = e => {
-    localStorage.removeItem("token");
-    axios.get(`${ROOT_URL}/api/logout`).then(res => {
-      console.log("res", res, "logged out");
-    });
+  handleLogoutClick = () => {
+    this.props.logout();
   };
 
   render() {
-    let token = localStorage.getItem("token");
-    // console.log(token);
+    console.log("this.props", this.props);
 
-    // if user signed in
-    if (token) {
+    if (this.props.isLoggedIn) {
       return (
         <div className="navigation-container">
           <div className="header">
@@ -32,7 +25,7 @@ class Navigation extends Component {
             <div className="signin-container">
               <Link
                 className="logout button"
-                to="/logout"
+                to="/"
                 onClick={this.handleLogoutClick}
               >
                 LOGOUT
@@ -66,8 +59,8 @@ class Navigation extends Component {
               </div>
             </Link>
             <div className="signin-container">
-              <Link className="signin button" to="/signin">
-                SIGN IN
+              <Link className="login button" to="/login">
+                LOGIN
               </Link>
               <Link className="signup button" to="/signup">
                 SIGN UP
@@ -81,4 +74,13 @@ class Navigation extends Component {
   }
 }
 
-export default Navigation;
+const mapStateToProps = state => {
+  return {
+    isLoggedIn: state.auth.isLoggedIn
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  { logout }
+)(Navigation);
