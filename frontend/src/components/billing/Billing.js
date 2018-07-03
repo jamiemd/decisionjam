@@ -2,59 +2,13 @@ import React, { Component } from "react";
 import { Elements } from "react-stripe-elements";
 import InjectedCheckoutForm from "./CheckoutForm";
 import { Link } from "react-router-dom";
-import axios from "axios";
 import { connect } from "react-redux";
 import "../../css/Billing.css";
 import { authenticate } from "../../actions/auth";
 
-const ROOT_URL = "http://localhost:8000";
-
 class Billing extends Component {
-  state = {
-    didFetchResultFromServer: false,
-    hasSubscription: false,
-    subscription: "",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: localStorage.getItem("token")
-    }
-  };
-
   componentDidMount() {
     this.props.authenticate();
-
-    const headers = this.state.headers;
-    axios
-      .get(`${ROOT_URL}/api/routeThatNeedsJWTToken`, { headers })
-      .then(res => {
-        // console.log("res", res);
-      })
-      .catch(error => {
-        console.log("error", error);
-      });
-    axios
-      .get(`${ROOT_URL}/api/subscriptionID`, { headers })
-      .then(res => {
-        console.log("res", res);
-        if (res.data.subscription && res.data.subscription.subscriptionID) {
-          this.setState({
-            hasSubscription: true,
-            subscription: res.data.subscription,
-            didFetchResultFromServer: true
-          });
-        } else {
-          this.setState({
-            hasSubscription: false,
-            didFetchResultFromServer: true
-          });
-        }
-      })
-      .catch(error => {
-        console.log("error", error);
-        this.setState({
-          didFetchResultFromServer: true
-        });
-      });
   }
 
   convertDate = unixtimestamp => {

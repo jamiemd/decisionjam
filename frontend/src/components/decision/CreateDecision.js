@@ -1,120 +1,67 @@
 import React, { Component } from "react";
-import axios from "axios";
-import { Redirect } from "react-router-dom";
+import { reduxForm, Field } from "redux-form";
 import { Link } from "react-router-dom";
+import { connect } from "react-redux";
+import { authenticate } from "../../actions/auth";
+import { createDecision } from "../../actions/decision";
+import { checkSubscriptionID } from "../../actions/billing";
 import "../../css/CreateDecision.css";
 
-const ROOT_URL = "http://localhost:8000";
-
-class Question extends Component {
-  state = {
-    decisionText: "",
-    decisionCode: "",
-    redirect: false,
-    didFetchResultFromServer: false,
-    username: "",
-    hasSubscriptionID: false,
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: localStorage.getItem("token")
-    }
-  };
-
-  // check auth to view page
+class CreateDecision extends Component {
   componentDidMount() {
-    const headers = this.state.headers;
-
-    axios
-      .get(`${ROOT_URL}/api/routeThatNeedsJWTToken`, { headers })
-      .then(res => {
-        // console.log("res", res);
-        this.setState({
-          didFetchResultFromServer: true,
-          username: res.data.user.username
-        });
-      })
-      .catch(error => {
-        this.setState({ didFetchResultFromServer: true, redirect: true });
-      });
-
-    axios
-      .get(`${ROOT_URL}/api/subscriptionID`, { headers })
-      .then(res => {
-        console.log("res", res);
-        if (res.data.subscription && res.data.subscription.subscriptionID) {
-          this.setState({ hasSubscriptionID: true });
-        } else {
-          this.setState({ hasSubscriptionID: false });
-        }
-      })
-      .catch(error => {
-        console.log("error", error.response);
-      });
+    this.props.authenticate();
+    this.props.checkSubscriptionID();
   }
 
-  setDecisionText = event => {
-    this.setState({ decisionText: event.target.value });
-  };
-
-  createQuestion = event => {
-    // console.log("Sending " + this.state.decisionText);
-    const postData = {
-      decisionText: this.state.decisionText
-    };
-    const headers = this.state.headers;
-    axios
-      .post(`${ROOT_URL}/api/decision/create`, postData, { headers })
-      .then(decision => {
-        console.log("decision", decision);
-        this.setState({ decisionCode: decision.data.decision.decisionCode });
-        this.props.history.push(
-          "/decision/decisionCode/" + this.state.decisionCode
-        );
-      })
-      .catch(error => console.log("Got error " + error.response.data.error));
+  handleFormSubmit = ({ decision }) => {
+    this.props.createDecision(decision);
   };
 
   render() {
     console.log("this.state", this.state);
+    const { handleSubmit } = this.props;
 
-    if (this.state.didFetchResultFromServer) {
-      if (this.state.redirect === true) {
-        return <Redirect to={"/signup"} />;
-      } else if (this.state.hasSubscriptionID) {
-        return (
-          <div className="question-wrapper">
+    if (this.state.hasSubscriptionID) {
+      return (
+        <div className="question-wrapper">
+          <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))}>
             <label className="question-title"> Create A New Question </label>
-            <div className="question-input-wrapper">
-              <textarea
-                className="question-input"
-                type="text"
-                value={this.state.decisionText}
-                onChange={this.setDecisionText}
-              />
-            </div>
-            <div>
-              <button onClick={this.createQuestion}> Create Question </button>
-            </div>
-          </div>
-        );
-      } else {
-        return (
-          <div>
-            <div className="question-purchase-text">
-              Purchase a subscription to creation decisions.
-              <div className="question-buy-link-container">
-                <Link className="question-buy-link" to="/billing/">
-                  BUY NOW
-                </Link>
-              </div>
-            </div>
-          </div>
-        );
-      }
+            <Field name="decision" component="input" type="text" />
+            <button type="submit">Submit</button>
+          </form>
+        </div>
+      );
     } else {
-      return null;
+      return (
+        <div>
+          <div className="question-purchase-text">
+            Purchase a subscription to creation decisions.
+            <div className="question-buy-link-container">
+              <Link className="question-buy-link" to="/billing/">
+                BUY NOW
+              </Link>
+            </div>
+          </div>
+        </div>
+      );
     }
   }
 }
 
-export default Question;
+const mapStateToProps = state => {
+  console.log("state", state);
+  return {
+    isLoggedIn: state.auth.isLoggedIn,
+    hasSubscriptionID: state.auth.isLoggedIn
+  };
+};
+
+CreateDecision = connect(
+  mapStateToProps,
+  { createDecision, checkSubscriptionID, authenticate }
+)(CreateDecision);
+
+export default reduxForm({
+  form: "create-decision",
+  fields: ["decision"]
+})(CreateDecision);

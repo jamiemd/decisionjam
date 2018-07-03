@@ -6,7 +6,7 @@ export const USER_REGISTERED = "USER_REGISTERED";
 export const USER_AUTHENTICATED = "USER_AUTHENTICATED";
 export const USER_UNAUTHENTICATED = "USER_UNAUTHENTICATED";
 export const AUTHENTICATION_ERROR = "AUTHENTICATION_ERROR";
-export const USER_HAS_SUBSCRIPTION = "USER_HAS_SUBSCRIPTION";
+export const HAS_SUBSCRIPTION = "USER_HAS_SUBSCRIPTION";
 
 export const authError = error => {
   console.log("autherror", error);

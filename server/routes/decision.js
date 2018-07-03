@@ -11,13 +11,6 @@ module.exports = app => {
       // console.log(decisionCode);
       let decisionCodeDupe = true;
 
-      //while (decisionCodeDupe) {  // i need to get this working so that it loops
-      //keeps generating a code until there is no match on the database. while
-      // while loops don't work with async findOne callback/promises as the while loop
-      // will always keep running and get priority over the async code but there must be
-      // a common solution for this as the general pattern i'm trying to cover is very common
-      // just have to match it into node async way of doing things
-      //getUser(Math.random().toString(36).substr(2, 5));
       console.log("in loop");
       //decisionCodeNotUnique = true;
       console.log(decisionCodeDupe);
@@ -75,7 +68,7 @@ module.exports = app => {
   );
 
   app.get(
-    "/api/decision/:id",
+    "/api/decision/find/:id",
     passport.authenticate("jwt", { session: false }),
     function(req, res) {
       const id = req.params.id;

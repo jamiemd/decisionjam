@@ -34,10 +34,10 @@ class Navigation extends Component {
           </div>
           <div className="hr-nav" />
           <div className="menu">
-            <Link className="menu-links" to="/question-page">
-              Create Decisions
+            <Link className="menu-links" to="/create-decision">
+              Create Decision
             </Link>
-            <Link className="menu-links" to="/mainpage">
+            <Link className="menu-links" to="/find-decision">
               Find Decision
             </Link>
             <Link className="menu-links" to="/billing">
