@@ -3,7 +3,7 @@ import {
   USER_AUTHENTICATED,
   USER_UNAUTHENTICATED,
   AUTHENTICATION_ERROR
-} from "../Actions/auth";
+} from "../actions/auth";
 
 export default (
   auth = {

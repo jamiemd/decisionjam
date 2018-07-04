@@ -26,8 +26,8 @@ passport.deserializeUser(function(user, done) {
   done(null, user);
 });
 
-mongoose.Promise = global.Promise;
 const connect = mongoose.connect("mongodb://localhost/decisionjam");
+mongoose.Promise = global.Promise;
 
 connect.then(
   () => {

@@ -5,20 +5,17 @@ const DecisionSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-
   decisionCode: {
     type: String,
     required: true,
     unique: true,
     index: true
   },
-  decisionCreatorId: String,
-
+  decisionCreatorUsername: String,
   voteOver: {
     type: Boolean,
     default: false
   },
-
   answers: [
     {
       answerText: {
@@ -30,18 +27,15 @@ const DecisionSchema = new mongoose.Schema({
       downVotes: [String]
     }
   ],
-
   maxVotesPerUser: {
     type: Number,
     default: 1
   },
-
   createdOn: {
     type: Date,
     required: true,
     default: Date.now
   },
-
   currentLoggedInUserId: {
     type: String,
     default: ""

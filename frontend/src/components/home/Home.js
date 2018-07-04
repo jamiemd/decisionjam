@@ -7,7 +7,7 @@ import "../../css/Home.css";
 
 class Home extends Component {
   render() {
-    if (this.props.isLoggedIn) {
+    if (this.props.isLoggedIn === true) {
       return <FindDecision />;
     } else {
       return (

@@ -1,119 +1,71 @@
 const passport = require("passport");
+const Decision = require("../db/DecisionModel");
+
+const STATUS_USER_ERROR = 422;
+const STATUS_SERVER_ERROR = 500;
+const STATUS_OKAY = 200;
+const STATUS_NOT_FOUND = 404;
 
 module.exports = app => {
+  // create decision
   app.post(
-    "/api/decision/create",
+    "/api/create-decision",
     passport.authenticate("jwt", { session: false }),
     function(req, res) {
-      const newDecision = new Decision(req.body);
-      // console.log("req.body", req.body);
-      let decisionCode = "feck";
-      // console.log(decisionCode);
-      let decisionCodeDupe = true;
-
-      console.log("in loop");
-      //decisionCodeNotUnique = true;
-      console.log(decisionCodeDupe);
-      //}
+      let decisionCode = "";
       Decision.findOne(
         {
           decisonCode: (decisionCode = Math.random()
             .toString(36)
             .substr(2, 5))
         },
-        function(err, result) {
+        function(err, duplicate) {
           if (err) {
-            console.log("in err");
-            res
-              .status(STATUS_USER_ERROR)
-              .json({ error: "Error while adding", err });
+            console.log("err", err);
+            res.status(STATUS_USER_ERROR).json({ message: "Search error" });
           }
-          if (result) {
-            console.log("result", result);
-            console.log(
-              "got a duplicate code server should be setup to generate another code"
-            );
-          } else {
-            console.log("code must be unique");
-            console.log(decisionCodeDupe);
-            decisionCodeDupe = false;
-            console.log(decisionCodeDupe);
+          if (duplicate) {
+            console.log("duplicate", duplicate);
           }
         }
       );
-
-      //}
-
+      // save new decision code
+      const newDecision = new Decision(req.body);
       newDecision.decisionCode = decisionCode;
-      // console.log("newDecision", newDecision);
-
-      // newDecision.decisionCreatorId = req.user.username;
-      newDecision.decisionCreatorId = req.user._id;
-
-      // console.log("decision make is" + newDecision.decisionCreatorId);
-      console.log("decisionCode", decisionCode);
-      //check the user contains all required data
-
+      newDecision.decisionCreatorUsername = req.user.username;
       newDecision.save((err, decision) => {
-        // console.log("decision", decision);
         if (err) {
           console.log("err", err);
           res.status(STATUS_USER_ERROR).json({ error: "Error while adding" });
         } else {
-          // console.log("decision in else", decision);
+          console.log("decision", decision);
           res.status(STATUS_OKAY).json({ decision: decision });
         }
       });
     }
   );
 
+  // find decision
   app.get(
-    "/api/decision/find/:id",
+    "/api/find-decision/:id",
     passport.authenticate("jwt", { session: false }),
     function(req, res) {
-      const id = req.params.id;
-      const userId = req.user.username;
-      Decision.findOne({ decisionCode: id }).then(
+      console.log("req.params", req.params);
+      const decisionCode = req.params.id;
+      Decision.findOne({ decisionCode: decisionCode }).then(
         decision => {
-          // console.log("decision in id", decision);
-
-          res.status(STATUS_OKAY).json({
-            ...decision.toObject(),
-            votesByUser: userVotes(decision, userId),
-            username: req.user.username
-          });
+          console.log("decision", decision);
+          res.status(STATUS_OKAY).json(decision);
         },
-        err =>
-          res
-            .status(STATUS_NOT_FOUND)
-            .json({ error: "Decision with id " + id + " not found" })
+        err => {
+          console.log("err", err);
+          res.status(STATUS_NOT_FOUND).json({ message: err });
+        }
       );
     }
   );
 
-  // postman test example localhost:8000/api/decision/decisionCode/k65gy
-  // server.get(
-  //   "/api/decision/decisionCode/:decisionCode",
-  //   passport.authenticate("jwt", { session: false }),
-  //   function(req, res) {
-  //     const currentLoddgedInUserId = req.user
-  //       ? req.user._id
-  //       : "5b01aeb1abaade1eacdc67ce";
-  //     const decisionCode = req.params.decisionCode;
-  //     console.log("decisionCode", decisionCode);
-  //     Decision.find({ decisionCode: decisionCode }).then(
-  //       decision => {
-  //         decision = Object.assign({ currentLoddgedInUserId }, decision);
-  //         return res.status(STATUS_OKAY).json(decision);
-  //       }, //{decision = Object.assign({currentLoddgedInUserId},decision);return
-  //       err =>
-  //         res
-  //           .status(STATUS_NOT_FOUND)
-  //           .json({ error: "Decision with code " + decisionCode + " not found" })
-  //     );
-  //   }
-  // );
-
+  // find decision
   app.get(
     "/api/decision/decisionCode/:decisionCode",
     passport.authenticate("jwt", { session: false }),
@@ -122,41 +74,6 @@ module.exports = app => {
         ? req.user._id
         : "5b01aeb1abaade1eacdc67ce";
       const decisionCode = req.params.decisionCode;
-      // console.log("decisonCode is " + decisionCode);
-      // console.log("currentLoggedInUserId Pat", currentLoggedInUserId);
-      //  Decision.find({ decisionCode: decisionCode }).then(
-      //   //decision => {decision = Object.assign({decision},{currentLoggedInUserId});return res.status(STATUS_OKAY).json(decision)}, //{decision = Object.assign({currentLoddgedInUserId},decision);return
-      //   decision =>  res.status(STATUS_OKAY).json({decision),
-      //   err =>
-      //     res
-      //       .status(STATUS_NOT_FOUND)
-      //       .json({ error: "Decision with code " + decisionCode + " not found" })
-      // );
-
-      // Decision.findOne({ decisionCode }).then(
-      //   decision => {
-      //     console.log("decision", decision);
-      //     Decision.updateOne(
-      //       { decision },
-      //       { $set: { currentLoggedInUserId } }
-      //     ).then(
-      //       result => {
-      //         console.log("result", result);
-      //         res.status(STATUS_OKAY).json(decision);
-      //       },
-      //       err => {
-      //         console.log("err", err);
-      //         res.status(STATUS_NOT_FOUND).json({
-      //           error: "Decision with id " + id + " not updated" + " " + err
-      //         });
-      //       }
-      //     );
-      //   },
-      //   err =>
-      //     res
-      //       .status(STATUS_NOT_FOUND)
-      //       .json({ error: "Decision with id " + id + " not found" })
-      // );
 
       Decision.updateOne(
         { decisionCode },
@@ -166,7 +83,7 @@ module.exports = app => {
           console.log("result", result);
           Decision.findOne({ decisionCode }).then(decision => {
             console.log("decision", decision);
-            res.status(STATUS_OKAY).json(decision);
+            res.status(STATUS_OKAY).json({ decision });
           });
         },
         err => {
@@ -359,16 +276,6 @@ module.exports = app => {
       // console.log("newValue", newValue);
 
       Decision.findOne({ decisionCode }).then(decision => {
-        // console.log(
-        //   "decision.decisionCreatorId",
-        //   typeof decision.decisionCreatorId
-        // );
-        // console.log("req.user", typeof req.user._id);
-        // console.log(
-        //   "decision.decisionCreatorId === req.user._id",
-        //   decision.decisionCreatorId === String(req.user._id)
-        // );
-        // if (decision.decisionCreatorId === req.user.username) {
         if (decision.decisionCreatorId === String(req.user._id)) {
           Decision.updateOne(
             { decisionCode },

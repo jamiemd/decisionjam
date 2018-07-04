@@ -79,9 +79,13 @@ export const logout = () => {
 };
 
 export const authenticate = () => {
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: localStorage.getItem("jwt")
+  };
   return dispatch => {
     axios
-      .get(`${ROOT_URL}/authenticate`)
+      .get(`${ROOT_URL}/authenticate`, { headers })
       .then(res => {
         console.log("res", res);
         dispatch({

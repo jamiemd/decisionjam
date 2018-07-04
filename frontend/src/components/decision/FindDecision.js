@@ -11,7 +11,8 @@ class FindDecision extends Component {
   }
 
   handleFormSubmit = ({ decisionCode }) => {
-    this.props.findDecision(decisionCode);
+    const { history } = this.props;
+    this.props.findDecision(decisionCode, history);
   };
 
   render() {

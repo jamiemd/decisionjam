@@ -1,4 +1,4 @@
-import { USER_BILLED, CHECK_SUBSCRIPTION_ID } from "./actions/decision";
+import { USER_BILLED, CHECK_SUBSCRIPTION_ID } from "../actions/decision";
 
 export default (state = {}, action) => {
   switch (action.type) {

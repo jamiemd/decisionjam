@@ -8,7 +8,7 @@ import Login from "./components/auth/Login";
 import Billing from "./components/billing/Billing";
 import CreateDecision from "./components/decision/CreateDecision";
 import FindDecision from "./components/decision/FindDecision";
-// import Decision from "./components/decision/decisionPage/Decision";
+import DecisionMain from "./components/decision/DecisionMain/DecisionMain";
 import "./App.css";
 
 class App extends Component {
@@ -26,7 +26,7 @@ class App extends Component {
             <Route exact path="/billing" component={Billing} />
             <Route exact path="/create-decision" component={CreateDecision} />
             <Route exact path="/find-decision" component={FindDecision} />
-            {/* <Route path="/decision/decisionCode/:id" component={Decision} /> */}
+            <Route exact path="/decision/:id" component={DecisionMain} />
           </div>
         </BrowserRouter>
       </StripeProvider>

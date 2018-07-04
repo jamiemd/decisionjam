@@ -107,6 +107,7 @@ module.exports = app => {
     "/api/authenticate",
     passport.authenticate("jwt", { session: false }),
     function(req, res) {
+      res.status(STATUS_OKAY);
       res.json({
         message: "Success! You can not see this without a token",
         user: req.user
