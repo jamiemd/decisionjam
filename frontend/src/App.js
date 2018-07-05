@@ -8,7 +8,7 @@ import Login from "./components/auth/Login";
 import Billing from "./components/billing/Billing";
 import CreateDecision from "./components/decision/CreateDecision";
 import FindDecision from "./components/decision/FindDecision";
-import DecisionMain from "./components/decision/DecisionMain/DecisionMain";
+import DecisionMain from "./components/decision/DecisionPages/DecisionMain";
 import "./App.css";
 
 class App extends Component {

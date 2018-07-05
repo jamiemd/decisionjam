@@ -51,11 +51,19 @@ module.exports = app => {
     passport.authenticate("jwt", { session: false }),
     function(req, res) {
       console.log("req.params", req.params);
+      console.log("req.user", req.user);
       const decisionCode = req.params.id;
       Decision.findOne({ decisionCode: decisionCode }).then(
         decision => {
           console.log("decision", decision);
-          res.status(STATUS_OKAY).json(decision);
+          if (decision.decisionCreatorUsername === req.user.username) {
+            res
+              .status(STATUS_OKAY)
+              .json({ decisionData: decision, isCreator: true });
+          } else
+            res
+              .status(STATUS_OKAY)
+              .json({ decisionData: decision, isCreator: false });
         },
         err => {
           console.log("err", err);

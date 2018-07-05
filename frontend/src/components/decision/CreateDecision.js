@@ -27,7 +27,7 @@ class CreateDecision extends Component {
       return (
         <div className="question-wrapper">
           <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))}>
-            <label className="question-title"> Create A New Question </label>
+            <label className="question-title"> Create A New Decision </label>
             <Field name="decisionText" component="input" type="text" />
             <button type="submit">Submit</button>
           </form>
