@@ -47,15 +47,15 @@ module.exports = app => {
 
   // find decision
   app.get(
-    "/api/find-decision/:id",
+    "/api/find-decision/:decisionCode",
     passport.authenticate("jwt", { session: false }),
     function(req, res) {
-      console.log("req.params", req.params);
-      console.log("req.user", req.user);
-      const decisionCode = req.params.id;
+      // console.log("req.params", req.params);
+      // console.log("req.user", req.user);
+      const decisionCode = req.params.decisionCode;
       Decision.findOne({ decisionCode: decisionCode }).then(
         decision => {
-          console.log("decision", decision);
+          // console.log("decision", decision);
           if (decision.decisionCreatorUsername === req.user.username) {
             res
               .status(STATUS_OKAY)
@@ -73,75 +73,52 @@ module.exports = app => {
     }
   );
 
-  // find decision
-  app.get(
-    "/api/decision/decisionCode/:decisionCode",
-    passport.authenticate("jwt", { session: false }),
-    function(req, res) {
-      const currentLoggedInUserId = req.user
-        ? req.user._id
-        : "5b01aeb1abaade1eacdc67ce";
-      const decisionCode = req.params.decisionCode;
-
-      Decision.updateOne(
-        { decisionCode },
-        { $set: { currentLoggedInUserId } }
-      ).then(
-        result => {
-          console.log("result", result);
-          Decision.findOne({ decisionCode }).then(decision => {
-            console.log("decision", decision);
-            res.status(STATUS_OKAY).json({ decision });
-          });
-        },
-        err => {
-          console.log("err", err);
+  app.get("/api/get-answers/:decisionCode", function(req, res) {
+    const decisionCode = req.params.decisionCode;
+    Decision.findOne({ decisionCode: decisionCode }).then(answer => {
+      res.status(STATUS_OKAY).json(answer),
+        error => {
           res.status(STATUS_NOT_FOUND).json({
-            error: "Decision with id " + id + " not updated" + " " + err
+            message: error
           });
-        }
-      );
-    }
-  );
+        };
+    });
+  });
 
-  app.put("/api/decision/:id/answer", function(req, res) {
-    const id = req.params.id;
-    console.log("id", id);
-    console.log(`req.body ${req.body.answer}`);
-    const answer = req.body.answer; //TODO add with the user id right now only string
-    //check if string answer is empty or null
-    // https://stackoverflow.com/questions/154059/how-do-you-check-for-an-empty-string-in-javascript
-    console.log("answer", answer);
-    if (!answer) {
-      console.log("answer is blank or undefined");
-      res.status(STATUS_USER_ERROR).json({ error: "Answer cannot be blank" });
+  // create answer and return answers array
+  app.put("/api/create-answer/:decisionCode", function(req, res) {
+    const decisionCode = req.params.decisionCode;
+    const newAnswer = req.body.answer;
+    // console.log("req.body", req.body);
+    if (!newAnswer) {
+      res.status(STATUS_USER_ERROR);
     } else {
-      Decision.findOne({ decisionCode: id }).then(
+      Decision.findOne({ decisionCode: decisionCode }).then(
         decision => {
-          console.log("decision.answers", decision.answers);
-          let answers = decision.answers;
-          if (answers === undefined) {
-            answers = [{ answerText: answer }];
+          let currentAnswers = decision.answers;
+          if (currentAnswers === undefined) {
+            currentAnswers = [{ answerText: newAnswer }];
           } else {
-            answers.push({ answerText: answer });
+            currentAnswers.push({ answerText: newAnswer });
           }
           Decision.updateOne(
-            { decisionCode: id },
-            { $set: { answers: answers } }
+            { decisionCode: decisionCode },
+            { $set: { answers: currentAnswers } }
           ).then(result => {
-            res
-              .status(STATUS_OKAY)
-              .json({ ...decision.toObject(), votesByUser: 0 }),
-              err =>
+            // console.log("decision", decision);
+            res.status(STATUS_OKAY).json(decision),
+              error => {
                 res.status(STATUS_NOT_FOUND).json({
-                  error: "Decision with id " + id + " not updated" + " " + err
+                  message: error
                 });
+              };
           });
         },
-        err =>
-          res
-            .status(STATUS_NOT_FOUND)
-            .json({ error: "Decision with id " + id + " not found" })
+        error => {
+          res.status(STATUS_NOT_FOUND).json({
+            message: error
+          });
+        }
       );
     }
   });
@@ -242,6 +219,7 @@ module.exports = app => {
       }
     }
   );
+
   // when react wants to change voteOver from false to true
   app.put(
     "/api/decision/:decisionCode/voteOverUpdate",

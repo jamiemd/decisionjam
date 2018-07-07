@@ -5,6 +5,8 @@ const ROOT_URL = "http://localhost:8000/api";
 export const CREATE_DECISION = "CREATE_DECISION";
 export const FIND_DECISION = "FIND_DECISION";
 export const RENDER_DECISION_TAB = "RENDER_DECISION_TAB";
+export const GET_ANSWERS = "GET_ANSWERS";
+export const CREATE_ANSWER = "CREATE ANSWER";
 
 const headers = {
   "Content-Type": "application/json",
@@ -40,7 +42,7 @@ export const findDecision = (decisionCode, history) => {
           type: FIND_DECISION,
           payload: res.data
         });
-        history.push("/decision" + decisionCode);
+        history.push("/decision/" + decisionCode);
       })
       .catch(error => {
         console.log("error", error);
@@ -53,5 +55,41 @@ export const renderDecisionTab = tab => {
   return {
     type: RENDER_DECISION_TAB,
     payload: tab
+  };
+};
+
+export const getAnswers = decisionCode => {
+  return dispatch => {
+    axios
+      .get(`${ROOT_URL}/get-answers/${decisionCode}`, { headers })
+      .then(res => {
+        console.log("res.data", res.data);
+        dispatch({
+          type: GET_ANSWERS,
+          payload: res.data
+        });
+      })
+      .catch(error => {
+        console.log("error", error.response);
+      });
+  };
+};
+
+export const createAnswer = (decisionCode, answer) => {
+  console.log("decisionCode", decisionCode);
+  console.log("answer", answer);
+  return dispatch => {
+    axios
+      .put(`${ROOT_URL}/create-answer/${decisionCode}`, answer)
+      .then(res => {
+        console.log("res.data", res.data);
+        dispatch({
+          type: CREATE_ANSWER,
+          payload: res.data
+        });
+      })
+      .catch(error => {
+        console.log("error.response", error.response);
+      });
   };
 };

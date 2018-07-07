@@ -22,7 +22,6 @@ const DecisionSchema = new mongoose.Schema({
         type: String,
         required: true
       },
-      //Votes contain list of user ids
       upVotes: [String],
       downVotes: [String]
     }

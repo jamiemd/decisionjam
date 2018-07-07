@@ -7,21 +7,18 @@ import { findDecision, renderDecisionTab } from "../../../actions/decision";
 // import "../../../css/Decision.css";
 
 class DecisionMain extends Component {
-  constructor(props) {
-    super(props);
-  }
-
   componentDidMount() {
     const decisionCode = this.props.match.params.id;
     this.props.findDecision(decisionCode);
   }
 
   onDecisionTabPress = tab => {
-    console.log("tab", tab);
+    // console.log("tab", tab);
     this.props.renderDecisionTab(tab);
   };
 
   renderSwitch = () => {
+    // console.log("this.props.activeTab", this.props.activeTab);
     switch (this.props.activeTab) {
       case "post":
         return <DecisionPost />;
@@ -35,7 +32,7 @@ class DecisionMain extends Component {
   };
 
   render() {
-    console.log("this.props", this.props);
+    // console.log("this.props", this.props);
 
     // if (this.props.isLoggedIn === false) {
     //   return <Home />;
