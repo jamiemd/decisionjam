@@ -10,16 +10,16 @@ const initialState = {
 };
 
 export default (state = initialState, action) => {
-  console.log("action.payload", action.payload);
+  // console.log("action", action);
   switch (action.type) {
     case FIND_DECISION:
-      return { ...state, data: action.payload };
+      return { ...state, ...action.payload };
     case RENDER_DECISION_TAB:
       return { ...state, activeTab: action.payload };
     case GET_ANSWERS:
-      return { ...state, answers: action.payload };
+      return { ...state, ...action.payload };
     case CREATE_ANSWER:
-      return { ...state, decisionData: action.payload };
+      return { ...state, ...action.payload };
     default:
       return state;
   }

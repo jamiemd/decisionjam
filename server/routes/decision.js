@@ -57,25 +57,23 @@ module.exports = app => {
         decision => {
           // console.log("decision", decision);
           if (decision.decisionCreatorUsername === req.user.username) {
-            res
-              .status(STATUS_OKAY)
-              .json({ decisionData: decision, isCreator: true });
-          } else
-            res
-              .status(STATUS_OKAY)
-              .json({ decisionData: decision, isCreator: false });
+            res.status(STATUS_OKAY).json({ decision, isCreator: true });
+          } else res.status(STATUS_OKAY).json({ decision, isCreator: false });
         },
         err => {
-          console.log("err", err);
+          // console.log("err", err);
           res.status(STATUS_NOT_FOUND).json({ message: err });
         }
       );
     }
   );
 
+  // get answers
   app.get("/api/get-answers/:decisionCode", function(req, res) {
     const decisionCode = req.params.decisionCode;
+    console.log("decisionCode", decisionCode);
     Decision.findOne({ decisionCode: decisionCode }).then(answer => {
+      console.log("answer", answer);
       res.status(STATUS_OKAY).json(answer),
         error => {
           res.status(STATUS_NOT_FOUND).json({

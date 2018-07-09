@@ -9,7 +9,8 @@ import { findDecision, renderDecisionTab } from "../../../actions/decision";
 class DecisionMain extends Component {
   componentDidMount() {
     const decisionCode = this.props.match.params.id;
-    this.props.findDecision(decisionCode);
+    const { history } = this.props;
+    this.props.findDecision(decisionCode, history);
   }
 
   onDecisionTabPress = tab => {
@@ -43,12 +44,12 @@ class DecisionMain extends Component {
       return (
         <div className="decision-container">
           <div className="decision-title">
-            {this.props.decisionData.decisionData.decisionText}
+            {this.props.decisionData.decisionText}
           </div>
           <div className="decision-code">
             <div className="code-title">Share this code</div>
             <div className="code-text">
-              {this.props.decisionData.decisionData.decisionCode}{" "}
+              {this.props.decisionData.decisionCode}{" "}
             </div>
           </div>
           <div className="hr-decisions" />
@@ -103,11 +104,11 @@ class DecisionMain extends Component {
 }
 
 const mapStateToProps = state => {
-  console.log("state", state);
+  // console.log("state", state);
   return {
     auth: state.auth.isLoggedIn,
     activeTab: state.decision.activeTab,
-    decisionData: state.decision.data
+    decisionData: state.decision
   };
 };
 

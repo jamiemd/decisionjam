@@ -19,7 +19,7 @@ export const createDecision = (decisionText, history) => {
     axios
       .post(`${ROOT_URL}/create-decision`, { decisionText }, { headers })
       .then(res => {
-        console.log("res", res);
+        // console.log("res", res);
         dispatch({
           type: CREATE_DECISION
         });
@@ -32,26 +32,25 @@ export const createDecision = (decisionText, history) => {
 };
 
 export const findDecision = (decisionCode, history) => {
-  console.log("decisionCode", decisionCode);
   return dispatch => {
     axios
       .get(`${ROOT_URL}/find-decision/${decisionCode}`, { headers })
       .then(res => {
-        console.log("res.data", res.data);
+        // console.log("res.data find-decision", res.data);
         dispatch({
           type: FIND_DECISION,
-          payload: res.data
+          payload: res.data.decision
         });
         history.push("/decision/" + decisionCode);
       })
       .catch(error => {
-        console.log("error", error);
+        // console.log("error", error);
       });
   };
 };
 
 export const renderDecisionTab = tab => {
-  console.log("tab", tab);
+  // console.log("tab", tab);
   return {
     type: RENDER_DECISION_TAB,
     payload: tab
@@ -63,7 +62,7 @@ export const getAnswers = decisionCode => {
     axios
       .get(`${ROOT_URL}/get-answers/${decisionCode}`, { headers })
       .then(res => {
-        console.log("res.data", res.data);
+        // console.log("res.data get-answers", res.data);
         dispatch({
           type: GET_ANSWERS,
           payload: res.data
@@ -82,7 +81,7 @@ export const createAnswer = (decisionCode, answer) => {
     axios
       .put(`${ROOT_URL}/create-answer/${decisionCode}`, answer)
       .then(res => {
-        console.log("res.data", res.data);
+        // console.log("res.data", res.data);
         dispatch({
           type: CREATE_ANSWER,
           payload: res.data
