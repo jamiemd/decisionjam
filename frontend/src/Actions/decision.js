@@ -6,15 +6,21 @@ export const CREATE_DECISION = "CREATE_DECISION";
 export const FIND_DECISION = "FIND_DECISION";
 export const RENDER_DECISION_TAB = "RENDER_DECISION_TAB";
 export const GET_ANSWERS = "GET_ANSWERS";
-export const CREATE_ANSWER = "CREATE ANSWER";
+export const POST_ANSWER = "POST_ANSWER";
+export const HANDLE_VOTE = "HANDLE_VOTE";
+export const SET_MAX_VOTES = "SET_MAX_VOTES";
 
-const headers = {
-  "Content-Type": "application/json",
-  Authorization: localStorage.getItem("jwt")
+const getHeaders = () => {
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: localStorage.getItem("jwt")
+  };
+  return headers;
 };
 
 export const createDecision = (decisionText, history) => {
-  console.log("decision", decisionText);
+  const headers = getHeaders();
+  console.log("headers", headers);
   return dispatch => {
     axios
       .post(`${ROOT_URL}/create-decision`, { decisionText }, { headers })
@@ -32,14 +38,16 @@ export const createDecision = (decisionText, history) => {
 };
 
 export const findDecision = (decisionCode, history) => {
+  const headers = getHeaders();
+
   return dispatch => {
     axios
       .get(`${ROOT_URL}/find-decision/${decisionCode}`, { headers })
       .then(res => {
-        // console.log("res.data find-decision", res.data);
+        console.log("res.data find-decision", res.data);
         dispatch({
           type: FIND_DECISION,
-          payload: res.data.decision
+          payload: res.data
         });
         history.push("/decision/" + decisionCode);
       })
@@ -58,6 +66,8 @@ export const renderDecisionTab = tab => {
 };
 
 export const getAnswers = decisionCode => {
+  const headers = getHeaders();
+
   return dispatch => {
     axios
       .get(`${ROOT_URL}/get-answers/${decisionCode}`, { headers })
@@ -74,21 +84,65 @@ export const getAnswers = decisionCode => {
   };
 };
 
-export const createAnswer = (decisionCode, answer) => {
+export const postAnswer = (decisionCode, answer) => {
   console.log("decisionCode", decisionCode);
   console.log("answer", answer);
   return dispatch => {
     axios
-      .put(`${ROOT_URL}/create-answer/${decisionCode}`, answer)
+      .put(`${ROOT_URL}/post-answer/${decisionCode}`, answer)
       .then(res => {
-        // console.log("res.data", res.data);
+        console.log("res.data", res.data);
         dispatch({
-          type: CREATE_ANSWER,
+          type: POST_ANSWER,
           payload: res.data
         });
       })
       .catch(error => {
         console.log("error.response", error.response);
       });
+  };
+};
+
+export const handleVote = (vote, answerId) => {
+  const headers = getHeaders();
+
+  const voteData = {
+    vote,
+    answerId
+  };
+  return dispatch => {
+    axios
+      .put(`${ROOT_URL}/handleVote`, { voteData }, { headers })
+      .then(res => {
+        console.log("res", res);
+        dispatch({
+          type: HANDLE_VOTE,
+          payload: res.data
+        });
+      })
+      .catch(error => {
+        console.log("error", error);
+      });
+  };
+};
+
+export const setMaxVotes = (maxVotes, decisionCode) => {
+  const headers = getHeaders();
+  const maxVotesData = {
+    maxVotes,
+    decisionCode
+  };
+  console.log("maxVotesData", maxVotesData);
+  return dispatch => {
+    axios
+      .put(`${ROOT_URL}/set-maxVote`, { maxVotesData }, { headers })
+      .then(res => {
+        console.log("res", res);
+        dispatch({
+          type: SET_MAX_VOTES,
+          payload: res.data
+        });
+      })
+      .catch(error => console.log("error", error.response));
   };
 };

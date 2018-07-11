@@ -1,37 +1,17 @@
 import React, { Component } from "react";
-import axios from "axios";
-
-const ROOT_URL = "http://localhost:8000";
+import { connect } from "react-redux";
+import { getAnswers } from "../../../actions/decision";
 
 class DecisionReveal extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      answersArray: [],
-      newAnswer: "",
-      decisionCode: this.props.decisionCode,
-      jwtToken: localStorage.getItem("token")
-    };
-  }
-
-  componentDidMount() {
-    const decisionCode = this.state.decisionCode;
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization: this.state.jwtToken
-    };
-    axios
-      .get(`${ROOT_URL}/api/decision/${decisionCode}`, { headers })
-      .then(res => {
-        // console.log("res.data", res.data);
-        this.setState({
-          answersArray: res.data.answers
-        });
-      })
-      .catch(error => {
-        console.log("erorr", error);
-        // this.setState({ decision: error.response.data.error });
-      });
+  componentWillReceiveProps(nextProps) {
+    if (
+      nextProps.decisionData.decisionCode !==
+      this.props.decisionData.decisionCode
+    ) {
+      const decisionCode = nextProps.decisionData.decisionCode;
+      console.log("this.props componentWillReceiveProps nextProps", nextProps);
+      this.props.getAnswers(decisionCode);
+    }
   }
 
   render() {
@@ -57,5 +37,17 @@ class DecisionReveal extends Component {
     );
   }
 }
+
+const mapStateToProps = state => {
+  console.log("state", state);
+  return {
+    decisionData: state.decision
+  };
+};
+
+DecisionReveal = connect(
+  mapStateToProps,
+  { getAnswers }
+)(DecisionReveal);
 
 export default DecisionReveal;

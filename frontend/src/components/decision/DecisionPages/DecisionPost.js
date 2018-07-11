@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { reduxForm, Field } from "redux-form";
 import { connect } from "react-redux";
-import { getAnswers, createAnswer } from "../../../actions/decision";
+import { getAnswers, postAnswer } from "../../../actions/decision";
 
 class DecisionPost extends Component {
   componentWillReceiveProps(nextProps) {
@@ -17,7 +17,7 @@ class DecisionPost extends Component {
 
   handleFormSubmit = answer => {
     const decisionCode = this.props.decisionData.decisionCode;
-    this.props.createAnswer(decisionCode, answer);
+    this.props.postAnswer(decisionCode, answer);
   };
 
   render() {
@@ -35,7 +35,7 @@ class DecisionPost extends Component {
       console.log("answersArray", answersArray);
 
       return (
-        <div className="post-containerg">
+        <div className="post-container">
           <div className="answers-container">
             {answersArray.length !== 0 ? (
               <div>
@@ -51,7 +51,10 @@ class DecisionPost extends Component {
           </div>
           <div className="hr-decisions " />
           <div className="answer-form-container">
-            <form onSubmit={handleSubmit(this.handleFormSubmit.bind(this))}>
+            <form
+              name="post-answer"
+              onSubmit={handleSubmit(this.handleFormSubmit.bind(this))}
+            >
               <Field name="answer" component="input" type="text" />
               <button type="submit">Submit</button>
             </form>
@@ -67,16 +70,16 @@ class DecisionPost extends Component {
 const mapStateToProps = state => {
   console.log("state", state);
   return {
-    decisionData: state.decision
+    decisionData: state.decision.decision
   };
 };
 
 DecisionPost = connect(
   mapStateToProps,
-  { getAnswers, createAnswer }
+  { getAnswers, postAnswer }
 )(DecisionPost);
 
 export default reduxForm({
-  form: "answers",
+  form: "post-answer",
   fields: ["answer"]
 })(DecisionPost);

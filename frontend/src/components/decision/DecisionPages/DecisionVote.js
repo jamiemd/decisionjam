@@ -1,246 +1,147 @@
 import React, { Component } from "react";
-import axios from "axios";
-
-const ROOT_URL = "http://localhost:8000";
+import { connect } from "react-redux";
+import {
+  findDecision,
+  getAnswers,
+  handleVote,
+  setMaxVotes
+} from "../../../actions/decision";
 
 class DecisionVote extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      error: "",
-      answersArray: [],
-      maxVotesPerUser: 1,
-      decisionCreatorId: "",
-      currentLoggedInUserId: "",
-      isCreator: false,
-      username: "",
-      voteOver: false,
-      decisionCode: this.props.decisionCode,
-      jwtToken: localStorage.getItem("token")
-    };
+  componentWillReceiveProps(nextProps) {
+    if (
+      nextProps.decisionData.decisionCode !==
+      this.props.decisionData.decisionCode
+    ) {
+      const decisionCode = nextProps.decisionData.decisionCode;
+      console.log("this.props componentWillReceiveProps nextProps", nextProps);
+      this.props.getAnswers(decisionCode);
+      this.props.findDecision(decisionCode);
+    }
   }
 
-  componentDidMount() {
-    const decisionCode = this.state.decisionCode;
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization: this.state.jwtToken
-    };
-    axios
-      .get(`${ROOT_URL}/api/decision/${decisionCode}`, { headers })
-      .then(res => {
-        console.log("res", res);
-        // console.log("res.data.votesByUser", res.data.votesByUser);
-        if (res.data.decisionCreatorId === res.data.currentLoggedInUserId) {
-          this.setState({ isCreator: true });
-        }
-        this.setState({
-          decision: res.data.decisionText,
-          answersArray: res.data.answers,
-          maxVotesPerUser: res.data.maxVotesPerUser,
-          votesByUser: res.data.votesByUser,
-          username: res.data.username,
-          voteOver: res.data.voteOver
-        });
-      })
-
-      .catch(error => {
-        this.setState({ error: error.response.data.error });
-      });
-  }
-
-  handleAnswerInput = e => {
-    e.preventDefault();
-    this.setState({ newAnswer: e.target.value });
+  handleVote = (vote, answerId) => {
+    this.props.handleVote(vote, answerId);
   };
 
-  handleUpvote(answerId, e) {
-    this.handleVote("YES", answerId);
-  }
-
-  handleDownvote(answerId, e) {
-    this.handleVote("NO", answerId);
-  }
-
-  handleVote(upOrDown, answerId) {
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization: this.state.jwtToken
-    };
-    axios
-      .put(
-        `${ROOT_URL}/api/decision/answer/${answerId}/vote?vote=${upOrDown}`,
-        "",
-        { headers }
-      )
-      .then(res => {
-        // console.log("res", res);
-        this.setState({
-          ...this.state,
-          answersArray: res.data.answers,
-          votesByUser: res.data.votesByUser
-        });
-      })
-      .catch(error => console.log("error", error.response));
-  }
-
-  areVotesDisabled() {
-    return this.state.votesByUser >= this.state.maxVotesPerUser;
-  }
-
-  sendMaxVotes(newValue) {
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization: this.state.jwtToken
-    };
-    // console.log(newValue);
-    axios
-      .put(
-        `${ROOT_URL}/api/decision/${
-          this.state.decisionCode
-        }/maxVotesPerUser?newValue=${newValue}`,
-        {},
-        { headers }
-      )
-      .then(res => {
-        console.log("res", res);
-        this.setState({});
-      })
-      .catch(error => console.log("error", error.response));
-  }
-
-  onMaxVotesClickDown = () => {
-    // const decisionCode = this.state.decisionCode;
-
-    this.setState({ maxVotesPerUser: this.state.maxVotesPerUser - 1 });
-    this.sendMaxVotes(this.state.maxVotesPerUser - 1);
-  };
-
-  onMaxVotesClickUp = () => {
-    // const decisionCode = this.state.decisionCode;
-    this.setState({ maxVotesPerUser: this.state.maxVotesPerUser + 1 });
-    this.sendMaxVotes(this.state.maxVotesPerUser + 1);
+  setMaxVotes = maxVotes => {
+    const decisionCode = this.props.decisionData.decision.decisionCode;
+    this.props.setMaxVotes(maxVotes, decisionCode);
   };
 
   render() {
-    //console.log("this.props", this.props);
-    console.log("this.state.voteOver", this.state.voteOver);
-    const answersArray = this.state.answersArray.length;
+    console.log("this.props", this.props);
+    // const answersArray = this.props.decisionData.answers.length;
 
-    let allFilteredUsernamesUpVotes = [];
-    let allFilteredUsernamesDownVotes = [];
-
-    for (let i = 0; i < this.state.answersArray.length; i++) {
-      let filteredUsernames = this.state.answersArray[i].upVotes.filter(
-        username => username === this.state.username
+    if (this.props.decisionData.decision.answers) {
+      const answersArray = this.props.decisionData.decision.answers.map(
+        x => x.answerText
       );
-      allFilteredUsernamesUpVotes.push(filteredUsernames.length);
-    }
-    for (let i = 0; i < this.state.answersArray.length; i++) {
-      let filteredUsernames = this.state.answersArray[i].downVotes.filter(
-        username => username === this.state.username
-      );
-      allFilteredUsernamesDownVotes.push(filteredUsernames.length);
-    }
-
-    let totalVotes = 0;
-    for (let i = 0; i < this.state.answersArray.length; i++) {
-      totalVotes += this.state.answersArray[i].upVotes.length;
-    }
-    for (let i = 0; i < this.state.answersArray.length; i++) {
-      totalVotes += this.state.answersArray[i].downVotes.length;
-    }
-    console.log("totalVotes", totalVotes);
-
-    return (
-      <div className="post-container">
-        <div className="maxvotes-container">
-          <div className="maxVotes">
-            <div className="maxvotes-description">Max votes per person</div>
-            {this.state.isCreator ? (
-              <button
-                disabled={this.state.voteOver}
-                className="maxvotes-button"
-                onClick={this.onMaxVotesClickDown}
-              >
-                -
-              </button>
-            ) : (
-              ""
-            )}
-
-            <div className="maxvotes-text">{this.state.maxVotesPerUser}</div>
-            {this.state.isCreator ? (
-              <button
-                disabled={this.state.voteOver}
-                className="maxvotes-button"
-                onClick={this.onMaxVotesClickUp}
-              >
-                +
-              </button>
-            ) : (
-              ""
-            )}
-          </div>
-          <div className="hr-decisions " />
-
-          <div className="vote-counts">
-            <div className="total-votes-container">
-              <div>Total votes</div>
-              <div className="totals">{totalVotes}</div>
+      return (
+        <div className="post-container">
+          <div className="maxvotes-container">
+            <div className="maxVotes">
+              <div className="maxvotes-description">Max votes per person</div>
+              {this.props.decisionData.isCreator ? (
+                <button
+                  // disabled={this.props.voteOver}
+                  className="maxvotes-button"
+                  onClick={() => this.setMaxVotes(-1)}
+                >
+                  -
+                </button>
+              ) : (
+                ""
+              )}
+              <div className="maxvotes-text">
+                {this.props.decisionData.decision.maxVotesPerUser}
+              </div>
+              {this.props.decisionData.isCreator ? (
+                <button
+                  // disabled={this.props.voteOver}
+                  className="maxvotes-button"
+                  onClick={() => this.setMaxVotes(1)}
+                >
+                  +
+                </button>
+              ) : (
+                ""
+              )}
             </div>
-            <div className="your-votes-container">
-              <div className="your-votes-text">Your votes </div>
-              <div className="totals">
-                {this.state.votesByUser}/{this.state.maxVotesPerUser}
+            <div className="hr-decisions " />
+
+            <div className="vote-counts">
+              <div className="total-votes-container">
+                <div>Total votes</div>
+                {/* <div className="totals">{totalVotes}</div> */}
+              </div>
+              <div className="your-votes-container">
+                <div className="your-votes-text">Your votes </div>
+                <div className="totals">
+                  {/* {this.props.votesByUser}/{this.props.maxVotesPerUser} */}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div className="answers-container">
-          {answersArray === 0 ? (
-            <div className="no-answer">There are no answers. </div>
-          ) : (
-            <div>
-              {this.state.answersArray.map((answer, i) => (
-                <div className="answer-container" key={answer._id}>
-                  <div className="answer-text">{answer.answerText}</div>
-                  <div className="vote-buttons-container">
-                    <button
-                      className="vote-button"
-                      onClick={this.handleDownvote.bind(this, answer._id)}
-                      disabled={
-                        this.state.voteOver || this.areVotesDisabled()
-                          ? "disabled"
-                          : false
-                      }
-                    >
-                      -
-                    </button>
-                    <div className="answer-vote-number">
-                      {allFilteredUsernamesUpVotes[i] -
-                        allFilteredUsernamesDownVotes[i]}
+          <div className="answers-container">
+            {answersArray === 0 ? (
+              <div className="no-answer">There are no answers. </div>
+            ) : (
+              <div>
+                {this.props.decisionData.decision.answers.map((answer, i) => (
+                  <div className="answer-container" key={answer._id}>
+                    <div className="answer-text">{answer.answerText}</div>
+                    <div className="vote-buttons-container">
+                      <button
+                        className="vote-button"
+                        onClick={this.handleVote("down", answer._id)}
+                        // disabled={
+                        //   this.props.voteOver || this.areVotesDisabled()
+                        //     ? "disabled"
+                        //     : false
+                        // }
+                      >
+                        -
+                      </button>
+                      <div className="answer-vote-number">
+                        {/* {allFilteredUsernamesUpVotes[i] -
+                        allFilteredUsernamesDownVotes[i]} */}
+                      </div>
+                      <button
+                        className="vote-button"
+                        onClick={this.handleVote("up", answer._id)}
+                        // disabled={
+                        //   this.props.voteOver || this.areVotesDisabled()
+                        //     ? "disabled"
+                        //     : false
+                        // }
+                      >
+                        +
+                      </button>
                     </div>
-                    <button
-                      className="vote-button"
-                      onClick={this.handleUpvote.bind(this, answer._id)}
-                      disabled={
-                        this.state.voteOver || this.areVotesDisabled()
-                          ? "disabled"
-                          : false
-                      }
-                    >
-                      +
-                    </button>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
-    );
+      );
+    } else {
+      return null;
+    }
   }
 }
+
+const mapStateToProps = state => {
+  console.log("state", state);
+  return {
+    decisionData: state.decision
+  };
+};
+
+DecisionVote = connect(
+  mapStateToProps,
+  { findDecision, getAnswers, handleVote, setMaxVotes }
+)(DecisionVote);
 
 export default DecisionVote;
