@@ -104,8 +104,8 @@ export const postAnswer = (decisionCode, answer) => {
 };
 
 export const handleVote = (vote, answerId) => {
-  console.log("vote", vote);
-  console.log("answerId", answerId);
+  // console.log("vote", vote);
+  // console.log("answerId", answerId);
   const headers = getHeaders();
 
   const voteData = {
@@ -116,7 +116,7 @@ export const handleVote = (vote, answerId) => {
     axios
       .put(`${ROOT_URL}/handleVote`, { voteData }, { headers })
       .then(res => {
-        console.log("res", res);
+        // console.log("res", res);
         dispatch({
           type: HANDLE_VOTE,
           payload: res.data

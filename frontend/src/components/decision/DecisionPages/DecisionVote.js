@@ -100,7 +100,7 @@ class DecisionVote extends Component {
                         -
                       </button>
                       <div className="answer-vote-number">
-                        {this.props.decisionData.maxVotes}
+                        {answer.upVotes.length - answer.downVotes.length}
                       </div>
                       <button
                         className="vote-button"
