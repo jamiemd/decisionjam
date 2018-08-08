@@ -24,17 +24,18 @@ class DecisionVote extends Component {
     this.props.handleVote(vote, answerId);
   };
 
-  setMaxVotes = maxVotes => {
-    const decisionCode = this.props.decisionData.decision.decisionCode;
-    this.props.setMaxVotes(maxVotes, decisionCode);
+  setMaxVotes = plusOrMinus => {
+    const decisionCode = this.props.decisionData.decisionCode;
+    this.props.setMaxVotes(plusOrMinus, decisionCode);
   };
 
   render() {
     console.log("this.props", this.props);
+    console.log("this.props.decisionData", this.props.decisionData);
     // const answersArray = this.props.decisionData.answers.length;
 
-    if (this.props.decisionData.decision.answers) {
-      const answersArray = this.props.decisionData.decision.answers.map(
+    if (this.props.decisionData.answers) {
+      const answersArray = this.props.decisionData.answers.map(
         x => x.answerText
       );
       return (
@@ -42,11 +43,11 @@ class DecisionVote extends Component {
           <div className="maxvotes-container">
             <div className="maxVotes">
               <div className="maxvotes-description">Max votes per person</div>
-              {this.props.decisionData.isCreator ? (
+              {this.props.isCreator ? (
                 <button
                   // disabled={this.props.voteOver}
                   className="maxvotes-button"
-                  onClick={() => this.setMaxVotes(-1)}
+                  onClick={() => this.setMaxVotes("minus")}
                 >
                   -
                 </button>
@@ -54,13 +55,13 @@ class DecisionVote extends Component {
                 ""
               )}
               <div className="maxvotes-text">
-                {this.props.decisionData.decision.maxVotesPerUser}
+                {this.props.decisionData.maxVotes}
               </div>
-              {this.props.decisionData.isCreator ? (
+              {this.props.isCreator ? (
                 <button
                   // disabled={this.props.voteOver}
                   className="maxvotes-button"
-                  onClick={() => this.setMaxVotes(1)}
+                  onClick={() => this.setMaxVotes("plus")}
                 >
                   +
                 </button>
@@ -88,33 +89,22 @@ class DecisionVote extends Component {
               <div className="no-answer">There are no answers. </div>
             ) : (
               <div>
-                {this.props.decisionData.decision.answers.map((answer, i) => (
+                {this.props.decisionData.answers.map((answer, i) => (
                   <div className="answer-container" key={answer._id}>
                     <div className="answer-text">{answer.answerText}</div>
                     <div className="vote-buttons-container">
                       <button
                         className="vote-button"
-                        onClick={this.handleVote("down", answer._id)}
-                        // disabled={
-                        //   this.props.voteOver || this.areVotesDisabled()
-                        //     ? "disabled"
-                        //     : false
-                        // }
+                        onClick={() => this.handleVote("minus", answer._id)}
                       >
                         -
                       </button>
                       <div className="answer-vote-number">
-                        {/* {allFilteredUsernamesUpVotes[i] -
-                        allFilteredUsernamesDownVotes[i]} */}
+                        {this.props.decisionData.maxVotes}
                       </div>
                       <button
                         className="vote-button"
-                        onClick={this.handleVote("up", answer._id)}
-                        // disabled={
-                        //   this.props.voteOver || this.areVotesDisabled()
-                        //     ? "disabled"
-                        //     : false
-                        // }
+                        onClick={() => this.handleVote("plus", answer._id)}
                       >
                         +
                       </button>
@@ -135,7 +125,9 @@ class DecisionVote extends Component {
 const mapStateToProps = state => {
   console.log("state", state);
   return {
-    decisionData: state.decision
+    decisionData: state.decision.decision,
+    isCreator: state.decision.isCreator,
+    votes: state.decision.decision.answers
   };
 };
 

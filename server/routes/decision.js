@@ -6,7 +6,7 @@ const STATUS_SERVER_ERROR = 500;
 const STATUS_OKAY = 200;
 const STATUS_NOT_FOUND = 404;
 
-let maxVotesCount = 0;
+let maxVotes = 0;
 
 module.exports = app => {
   // create decision
@@ -72,9 +72,11 @@ module.exports = app => {
 
   // get answers
   app.get("/api/get-answers/:decisionCode", function(req, res) {
+    // console.log("getanswers route called");
     const decisionCode = req.params.decisionCode;
-    Decision.findOne({ decisionCode: decisionCode }).then(answer => {
-      res.status(STATUS_OKAY).json(answer),
+    Decision.findOne({ decisionCode: decisionCode }).then(decision => {
+      // console.log("decision.answers", decision.answers);
+      res.status(STATUS_OKAY).json(decision.answers),
         error => {
           res.status(STATUS_NOT_FOUND).json({
             message: error
@@ -87,7 +89,7 @@ module.exports = app => {
   app.put("/api/post-answer/:decisionCode", function(req, res) {
     const decisionCode = req.params.decisionCode;
     const newAnswer = req.body.answer;
-    console.log("req.body", req.body);
+    // console.log("req.body", req.body);
     if (!newAnswer) {
       res.status(STATUS_USER_ERROR);
     } else {
@@ -126,78 +128,128 @@ module.exports = app => {
     "/api/handleVote",
     passport.authenticate("jwt", { session: false }),
     function(req, res) {
-      // console.log("req.body", req.body);
+      const userName = req.user.username;
       const vote = req.body.voteData.vote;
       const answerId = req.body.voteData.answerId;
-
-      // can't have more than one vote per answer
-      // second tap on upvote cancels the upvote and vice versa for downvote
-      // if upVote, add to upVotes array, same for downvote for downvotes array
-      // add vote based on answerId
-      // based on max votes, set max votes for each userid
-
       if (vote === undefined) {
         res.status(STATUS_USER_ERROR).json({ message: "Error" });
       } else {
-        Decision.findOne({ "answers._id": answerId })
-          .then(
-            decision => {
-              // console.log("decision", decision);
-            },
-            error => {
-              console.log("err", error);
-              res
-                .status(STATUS_NOT_FOUND)
-                .json({ error: "answer with id " + answerId + " not found" });
+        Decision.findOne({ "answers._id": answerId }).then(
+          decision => {
+            // get answer index
+            let answerIndex;
+            for (let i = 0; i < decision.answers.length; i++) {
+              if (decision.answers[i]._id.toString() === answerId) {
+                answerIndex = i;
+              }
             }
-          )
-          .catch(error => {
-            console.log(error);
-          });
+
+            let upVotesArray = decision.answers[answerIndex].upVotes;
+            let downVotesArray = decision.answers[answerIndex].downVotes;
+
+            console.log("decision.answers before", decision.answers);
+
+            // get userName count
+            let count = 0;
+            for (let i = 0; i < decision.answers.length; i++) {
+              for (let j = 0; j < decision.answers[j].upVotes.length; j++) {
+                if (decision.answers[i].upVotes[j] === userName) {
+                  count++;
+                }
+              }
+              for (let k = 0; k < decision.answers[k].downVotes.length; k++) {
+                if (decision.answers[i].downVotes[k] === userName) {
+                  count++;
+                }
+              }
+            }
+            console.log("count before", count);
+
+            // if (decision.maxVotes >= count) {
+            //   return res.end();
+            // }
+
+            if (vote === "plus") {
+              if (upVotesArray.some(x => x === userName)) {
+                upVotesArray.splice(upVotesArray.indexOf(userName), 1);
+              } else {
+                upVotesArray.push(userName);
+                downVotesArray.splice(downVotesArray.indexOf(userName), 1);
+              }
+            }
+            if (vote === "minus") {
+              if (downVotesArray.some(x => x === userName)) {
+                downVotesArray.splice(downVotesArray.indexOf(userName), 1);
+              } else {
+                downVotesArray.push(userName);
+                upVotesArray.splice(upVotesArray.indexOf(userName), 1);
+              }
+            }
+
+            console.log("decision.answers after", decision.answers);
+
+            decision.save().then(
+              decision => {
+                // console.log("decision.answers in save", decision.answers);
+                res.json(decision.answers);
+              },
+              err => {
+                console.log("error", err);
+              }
+            );
+          },
+          error => {
+            res.status(STATUS_NOT_FOUND).json({
+              message: error
+            });
+          }
+        );
       }
     }
   );
 
   // set max votes
   app.put(
-    "/api/set-maxVote",
+    "/api/set-maxVote/:decisionCode",
     passport.authenticate("jwt", { session: false }),
     function(req, res) {
-      console.log("req.body", req.body);
-      const decisionCode = req.body.maxVotesData.decisionCode;
-      const maxVotes = req.body.maxVotesData.maxVotes;
-      console.log("maxvotes", maxVotes);
+      const decisionCode = req.params.decisionCode;
+      const plusOrMinus = req.body.plusOrMinus;
+      const userName = req.user.username;
 
-      if (maxVotes === -1) {
-        maxVotesCount--;
-      } else if (maxVotes === 1) {
-        maxVotesCount++;
+      if (plusOrMinus === "minus") {
+        maxVotes--;
+      } else {
+        maxVotes++;
       }
+      console.log("maxVote", maxVotes);
 
-      console.log("maxvotecount", maxVotesCount);
-
-      // Decision.findOne({ decisionCode: decisionCode }).then(decision => {
-      //   // console.log("decision set maxvotes", decision);
-      //   if (decision.decisionCreatorUsername === req.user.username) {
-      //     Decision.updateOne(
-      //       { decisionCode },
-      //       { $set: { maxVotesPerUser: maxVotes } }
-      //     ).then(
-      //       decision => {
-      //         res.status(STATUS_OKAY).json(decision);
-      //       },
-      //       error => {
-      //         res.status(STATUS_SERVER_ERROR).json({ error: error });
-      //       }
-      //     );
-      //   } else {
-      //     res
-      //       .status(STATUS_USER_ERROR)
-      //       .json({ error: "Failed to update max votes user is not owner" });
-      //   }
-      // });
+      Decision.findOne({ decisionCode }).then(decision => {
+        console.log("decision.maxVotes before", decision.maxVotes);
+        if (decision.decisionCreatorUsername === userName) {
+          Decision.updateOne({ decisionCode }, { $set: { maxVotes: maxVotes } })
+            .then(decision => {
+              Decision.findOne({ decisionCode }).then(decision => {
+                console.log("decision", decision);
+                res.status(STATUS_OKAY).json(decision.maxVotes);
+              });
+            })
+            .catch(error => {
+              console.log("error", error);
+              res.status(STATUS_SERVER_ERROR).json({ message: "Server Error" });
+            });
+        } else {
+          res.status(STATUS_NOT_FOUND).json({ message: "No decision found" });
+        }
+      });
     }
   );
+
+  // set max votes
+  app.put("/api/set-maxVote/:decisionCode", function(req, res) {
+    console.log("req.body", req.body);
+    res.send({ message: req.body.maxVotes });
+  });
 
   // when react wants to change voteOver from false to true
   app.put(

@@ -67,7 +67,7 @@ export const renderDecisionTab = tab => {
 
 export const getAnswers = decisionCode => {
   const headers = getHeaders();
-
+  console.log("get answers called");
   return dispatch => {
     axios
       .get(`${ROOT_URL}/get-answers/${decisionCode}`, { headers })
@@ -104,6 +104,8 @@ export const postAnswer = (decisionCode, answer) => {
 };
 
 export const handleVote = (vote, answerId) => {
+  console.log("vote", vote);
+  console.log("answerId", answerId);
   const headers = getHeaders();
 
   const voteData = {
@@ -126,16 +128,16 @@ export const handleVote = (vote, answerId) => {
   };
 };
 
-export const setMaxVotes = (maxVotes, decisionCode) => {
+export const setMaxVotes = (plusOrMinus, decisionCode) => {
   const headers = getHeaders();
-  const maxVotesData = {
-    maxVotes,
-    decisionCode
-  };
-  console.log("maxVotesData", maxVotesData);
+  console.log("setMaxVotes called and headers", headers);
   return dispatch => {
     axios
-      .put(`${ROOT_URL}/set-maxVote`, { maxVotesData }, { headers })
+      .put(
+        `${ROOT_URL}/set-maxVote/${decisionCode}`,
+        { plusOrMinus },
+        { headers }
+      )
       .then(res => {
         console.log("res", res);
         dispatch({
@@ -143,6 +145,8 @@ export const setMaxVotes = (maxVotes, decisionCode) => {
           payload: res.data
         });
       })
-      .catch(error => console.log("error", error.response));
+      .catch(error => {
+        console.log("error", error.response);
+      });
   };
 };

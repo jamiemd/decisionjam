@@ -33,7 +33,7 @@ class DecisionMain extends Component {
   };
 
   render() {
-    console.log("this.props", this.props);
+    // console.log("this.props", this.props);
 
     // if (this.props.isLoggedIn === false) {
     //   return <Home />;
@@ -104,7 +104,7 @@ class DecisionMain extends Component {
 }
 
 const mapStateToProps = state => {
-  console.log("state", state);
+  // console.log("state", state);
   return {
     auth: state.auth.isLoggedIn,
     activeTab: state.decision.activeTab,

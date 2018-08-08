@@ -26,7 +26,7 @@ const DecisionSchema = new mongoose.Schema({
       downVotes: [String]
     }
   ],
-  maxVotesPerUser: {
+  maxVotes: {
     type: Number,
     default: 1
   },
@@ -38,7 +38,18 @@ const DecisionSchema = new mongoose.Schema({
   currentLoggedInUserId: {
     type: String,
     default: ""
-  }
+  },
+  totalVotesPerUser: [
+    {
+      userName: {
+        type: String,
+        required: true
+      },
+      type: Number,
+      required: true,
+      default: 0
+    }
+  ]
 });
 
 const DecisionModel = mongoose.model("Decision", DecisionSchema);
